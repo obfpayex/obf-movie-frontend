@@ -1,6 +1,7 @@
 package com.obf.movie.obfmoviefrontend.service
 
 import com.obf.movie.obfmoviefrontend.model.Movie
+import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
@@ -13,7 +14,8 @@ class MovieService{
     fun getAllMovies(restTemplate: RestTemplate){
 
         val headers : HttpHeaders = HttpHeaders();
-        restTemplate.exchange("",HttpMethod.GET,headers, Movie());
+        val entity : HttpEntity = HttpEntity();
+        restTemplate.exchange("",HttpMethod.GET,entity, String::class);
 
     }
 }
