@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Movies</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+    <style>
+        p {
+            margin: 0
+        }
+    </style>
+</head>
+<body class="container">
+<div class="jumbotron">
+    <div class="row">
+        <div class="col-md-12" style="margin-top:1px">
+            <h1>Movie Info</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6" style="margin-top:1px">
+            <p th:text="'Orginal Tittle: ' +  ${movieAllInfo.movie.originalTitle}"/>
+            <p th:text="'Norvegian Tittle: ' +  ${movieAllInfo.movie.norwegianTitle}"/>
+            <p th:text="'Age Limit: ' +  ${movieAllInfo.movie.ageLimit} + ' year'"/>
+            <p th:text="'Production Year: ' +  ${movieAllInfo.movie.productionYear}"/>
+            <p th:text="'Length: ' +  ${movieAllInfo.movie.runningTime} + ' min'"/>
+            <p th:text="'Release date: ' +  ${movieAllInfo.movie.releaseDate}"/>
+            <p th:text="'Summary: '"/>
+            <p th:text="${movieAllInfo.movie.summary}"/>
+           
+            <br>
+            <h2>Categories</h2>
+            <div th:if="${movieAllInfo.categoriesAsString != null}">
+                <p th:text="${movieAllInfo.categoriesAsString}"/>
+            </div>
+        </div>
+
+        <div class="col-md-6" style="margin-top:1px">
+            <h2>Directors's</h2>
+            <div th:if="${!movieAllInfo.directorsToMovie.isEmpty()}">
+                <div th:each="directorToMovie : ${movieAllInfo.directorsToMovie}">
+                    <p th:text="${directorToMovie.firstName} + ' ' + ${directorToMovie.lastName}"/>
+                </div>
+            </div>
+            <br>
+            <h2>Actor's</h2>
+            <div th:if="${!movieAllInfo.actorsToMovie.isEmpty()}">
+                <div th:each="actorToMovie : ${movieAllInfo.actorsToMovie}">
+                    <!--p th:text="'Name : ' +  ${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' AS ' ${actorToMovie.characterName}"/-->
+                    <div th:if="${actorToMovie.characterName != null}">
+                        <p th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' As ' + ${actorToMovie.characterName}"/>
+                    </div>
+                    <div th:if="${actorToMovie.characterName == null}">
+                        <p th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <form action="#" th:action="@{/getMovies}" method="post">
+                <div class="col-md-6" style="margin-top:1px">
+                    <button type="submit" class="btn btn-primary">Back</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

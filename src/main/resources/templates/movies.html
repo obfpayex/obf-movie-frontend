@@ -11,5 +11,8 @@
 </head>
 <body class="container">
 <h1>Movies</h1>
+<div th:each="movie : ${movieList}">
+    <a th:text="${movie.originalTitle}" th:href="@{|/getMovie/${movie.oid}|}"></a>
+</div>
 </body>
 </html>
