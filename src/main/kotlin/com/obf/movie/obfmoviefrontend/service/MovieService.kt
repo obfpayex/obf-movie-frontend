@@ -3,26 +3,26 @@ package com.obf.movie.obfmoviefrontend.service
 import com.obf.movie.obfmoviefrontend.model.Category
 import com.obf.movie.obfmoviefrontend.model.Movie
 import com.obf.movie.obfmoviefrontend.model.MovieAllInfo
+import com.obf.movie.obfmoviefrontend.util.Constants
 import org.slf4j.LoggerFactory
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.*
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
-import java.util.*
 
 
 inline fun <reified T : Any> typeRef(): ParameterizedTypeReference<T> = object : ParameterizedTypeReference<T>() {}
 
 @Service
-class MovieService{
+class MovieService {
 
     private val log = LoggerFactory.getLogger(MovieService::class.java)
-    fun getAllMovies(restTemplate: RestTemplate):List<Movie>{
+    fun getAllMovies(restTemplate: RestTemplate): List<Movie> {
 
         val headers = HttpHeaders()
         headers.set("Session-Id", null)
         val result: ResponseEntity<List<Movie>> = restTemplate.exchange(
-                "http://localhost:20200/api/movie?size=10&page=0&sort=oid,asc",
+                Constants.URL_ListMOvie + "?size=10&page=0&sort=oid,asc",
                 HttpMethod.GET,
                 HttpEntity("parameters", headers),
                 typeRef<List<Movie>>())
@@ -32,55 +32,107 @@ class MovieService{
 
     }
 
-    fun getOneMovie(restTemplate: RestTemplate, oid: Long ): Movie{
+    fun getOneMovie(restTemplate: RestTemplate, oid: Long): Movie {
         val headers = HttpHeaders()
         headers.set("Session-Id", null)
 
         val result: ResponseEntity<Movie> = restTemplate.exchange(
-                "http://localhost:20200/api/movie/" + oid,
+                Constants.URL_OneMOvie + oid,
                 HttpMethod.GET,
                 HttpEntity("parameters", headers),
                 typeRef<Movie>())
 
-        if(result?.statusCode === HttpStatus.OK && result.hasBody()){
+        if (result?.statusCode === HttpStatus.OK && result.hasBody()) {
             return result.body as Movie
         } else {
-            throw Exception("Could not find movie with oid : " +oid);
+            throw Exception("Could not find movie with oid : " + oid);
+        }
+    }
+
+    fun getAllInfoOneMovie(restTemplate: RestTemplate, oid: Long): MovieAllInfo {
+        val headers = HttpHeaders()
+        headers.set("Session-Id", null)
+
+        val result: ResponseEntity<MovieAllInfo> = restTemplate.exchange(
+                Constants.URL_AllInfoOneMOvie + oid,
+                HttpMethod.GET,
+                HttpEntity("parameters", headers),
+                typeRef<MovieAllInfo>())
+
+        if (result?.statusCode === HttpStatus.OK && result.hasBody()) {
+            return convertMovieAllInfo(result)
+        } else {
+            throw Exception("Could not find movie with oid : " + oid)
         }
 
 
     }
 
-    fun getAllInfoOneMovie(restTemplate: RestTemplate, oid: Long ): MovieAllInfo{
+    fun getLatestMovie(restTemplate: RestTemplate): MovieAllInfo {
         val headers = HttpHeaders()
         headers.set("Session-Id", null)
 
         val result: ResponseEntity<MovieAllInfo> = restTemplate.exchange(
-                "http://localhost:20200/api/movie/complete-movie-info/" + oid,
+                Constants.URL_LatestMOvie,
                 HttpMethod.GET,
                 HttpEntity("parameters", headers),
                 typeRef<MovieAllInfo>())
 
-        if(result?.statusCode === HttpStatus.OK && result.hasBody()){
-            var movieAllInfo : MovieAllInfo = result.body as MovieAllInfo
-            var list : List<Category>  = movieAllInfo.categories.orEmpty()
-            if (list.isNotEmpty() ){
-                var categoryString = ""
-                for (cat : Category in list){
-                    if (categoryString.length == 0){
-                        categoryString = cat.title
-                    } else {
-                        categoryString = categoryString + ", " + cat.title
-                    }
-
-                }
-                movieAllInfo.categoriesAsString = categoryString
-            }
-            return movieAllInfo
+        if (result?.statusCode === HttpStatus.OK && result.hasBody()) {
+            return convertLatestMovie(convertMovieAllInfo(result))
         } else {
-            throw Exception("Could not find movie with oid : " +oid)
+            throw Exception("Some Thing went Wrong");
         }
 
 
+    }
+
+    fun searchOriginalTitle(restTemplate: RestTemplate, originalTitle: String): List<Movie> {
+        val headers = HttpHeaders()
+        headers.set("Session-Id", null)
+        val result: ResponseEntity<List<Movie>> = restTemplate.exchange(
+                Constants.URL_SearchOriginalTitle + "?originalTitle="+ originalTitle + "&size=10&page=0&sort=oid,asc",
+                HttpMethod.GET,
+                HttpEntity("parameters", headers),
+                typeRef<List<Movie>>())
+
+
+        return result.body as List
+    }
+
+
+
+    private fun convertLatestMovie(result: MovieAllInfo): MovieAllInfo {
+
+
+        if (result.actorsToMovie.orEmpty().size > 3) {
+            result.actorsToMovie = result.actorsToMovie.orEmpty().subList(0, 3)
+        }
+
+        if (result.directorsToMovie.orEmpty().size > 3) {
+            result.directorsToMovie = result.directorsToMovie.orEmpty().subList(0, 3)
+        }
+
+
+        return result;
+    }
+
+
+    private fun convertMovieAllInfo(result: ResponseEntity<MovieAllInfo>): MovieAllInfo {
+        var movieAllInfo: MovieAllInfo = result.body as MovieAllInfo
+        var list: List<Category> = movieAllInfo.categories.orEmpty()
+        if (list.isNotEmpty()) {
+            var categoryString = ""
+            for (cat: Category in list) {
+                if (categoryString.length == 0) {
+                    categoryString = cat.title
+                } else {
+                    categoryString = categoryString + ", " + cat.title
+                }
+
+            }
+            movieAllInfo.categoriesAsString = categoryString
+        }
+        return movieAllInfo
     }
 }

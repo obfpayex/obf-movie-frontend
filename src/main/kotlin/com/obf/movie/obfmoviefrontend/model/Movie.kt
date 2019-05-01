@@ -9,6 +9,6 @@ data class Movie(
     var runningTime: Long?,
     var releaseDate: Date?,
     var summary: String?,
-    var ageLimit: String,
-    var productionYear: Long
+    var ageLimit: String?,
+    var productionYear: Long?
 )

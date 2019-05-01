@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Person</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+    <style>
+        p {
+            margin: 0
+        }
+    </style>
+</head>
+<body class="container">
+<div class="jumbotron">
+    <div class="row">
+        <div class="col-md-12" style="margin-top:1px">
+            <h1>Person Info</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6" style="margin-top:1px">
+            <p th:text="'Name : ' +  ${personAllInfo.person.firstName} + ' ' +  ${personAllInfo.person.lastName}"/>
+            <p th:text="'born: ' +  ${#dates.format(personAllInfo.person.born, 'yyyy-MM-dd')}"/>
+
+        </div>
+
+        <div class="col-md-6" style="margin-top:1px">
+            <div th:if="${!personAllInfo.moviesToActor.isEmpty()}">
+                <h2>Movies as Actor</h2>
+                <div th:each="movieToActor : ${personAllInfo.moviesToActor}">
+
+                    <div th:if="${movieToActor.characterName != null}">
+                        <a th:text="${movieToActor.productionYear} + '-' + ${movieToActor.originalTitle} + ' as  ' + ${movieToActor.characterName}" th:href="@{|/getMovie/${movieToActor.movieOid}|}"/>
+                    </div>
+                    <div th:if="${movieToActor.characterName == null}">
+                        <a th:text="${movieToActor.productionYear} + '-' + ${movieToActor.originalTitle}" th:href="@{|/getMovie/${movieToActor.movieOid}|}"/>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${!personAllInfo.moviesToDirector.isEmpty()}">
+                <br>
+                <h2>Movies as director</h2>
+                <div th:each="movieToDirector : ${personAllInfo.moviesToDirector}">
+                    <a th:text="${movieToDirector.productionYear} + '-' + ${movieToDirector.originalTitle}" th:href="@{|/getMovie/${movieToDirector.movieOid}|}"/>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <form action="#" th:action="@{/movieHome}" method="post">
+                <div class="col-md-6" style="margin-top:1px">
+                    <button type="submit" class="btn btn-primary">Home</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Movies</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+    <style>
+        p {
+            margin: 0
+        }
+    </style>
+</head>
+<body class="container">
+<div class="jumbotron">
+    <div class="row">
+        <div class="col-md-12" style="margin-top:1px">
+            <h1>Movie Home</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6" style="margin-top:1px">
+            <h2>Last Movie In Base</h2>
+            <p th:text="'Orginal Tittle: ' +  ${movieAllInfoLatest.movie.originalTitle}"/>
+            <p th:text="'Age Limit: ' +  ${movieAllInfoLatest.movie.ageLimit} + ' year'"/>
+            <p th:text="'Production Year: ' +  ${movieAllInfoLatest.movie.productionYear}"/>
+            <p th:text="'Length: ' +  ${movieAllInfoLatest.movie.runningTime} + ' min'"/>
+            <div th:if="${movieAllInfoLatest.categoriesAsString != null}">
+                <p th:text="'Categories: ' + ${movieAllInfoLatest.categoriesAsString}"/>
+            </div>
+        </div>
+
+        <div class="col-md-6" style="margin-top:1px">
+            <h4>Directors's</h4>
+            <div th:if="${!movieAllInfoLatest.directorsToMovie.isEmpty()}">
+                <div th:each="directorToMovie : ${movieAllInfoLatest.directorsToMovie}">
+                    <a th:text="${directorToMovie.firstName} + ' ' + ${directorToMovie.lastName}"
+                       th:href="@{|/getPerson/${directorToMovie.personOid}|}"/>
+                </div>
+            </div>
+            <h4>Actor's</h4>
+            <div th:if="${!movieAllInfoLatest.actorsToMovie.isEmpty()}">
+                <div th:each="actorToMovie : ${movieAllInfoLatest.actorsToMovie}">
+                    <div th:if="${actorToMovie.characterName != null}">
+                        <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' As ' + ${actorToMovie.characterName}"
+                           th:href="@{|/getPerson/${actorToMovie.personOid}|}"/>
+                    </div>
+                    <div th:if="${actorToMovie.characterName == null}">
+                        <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName}"
+                           th:href="@{|/getPerson/${actorToMovie.personOid}|}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+
+    <form action="#" th:action="@{/search}"  th:object="${search}" method="post">
+    <!--form action="#" data-th-action="@{/search}" data-th-object="${search}" method="post"-->
+        <div class="row">
+            <div class="col-md-3" style="margin-top:1px">
+                <input type="text" class="form-control" placeholder="Search" id="searchCriteria" th:field="*{searchCriteria}"/>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+            <div class="col-md-3" style="margin-top:1px">
+                <input type="text" class="form-control" placeholder="movie/actor/all" id="searchType" th:field="*{searchType}"/>
+                <!--<select th:field="*{search.searchType}">-->
+                    <!--<option th:value="'ALL'" th:text="All"></option>-->
+                    <!--<option th:value="'MOVIE'" th:text="Movie"></option>-->
+                    <!--<option th:value="'PERSON'" th:text="Person"></option>-->
+                <!--</select>-->
+            </div>
+        </div>
+    </form>
+    <br>
+    <div class="row">
+        <div class="col-md-6" style="margin-top:1px">
+            <div th:if="${message != null && !message.isEmpty()}">
+                <!--<input type="text" class="form-control" placeholder="message" id="message" th:field="*{message.toString()}"/>-->
+                <p th:text="${message}"/>
+            </div>
+
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-2" style="margin-top:1px">
+            <a href="/add-movie" class="btn btn-primary" role="button">Add Movie</a>
+        </div>
+        <div class="col-md-2" style="margin-top:1px">
+            <a href="/add-person" class="btn btn-primary" role="button">Add Person</a>
+        </div>
+    </div>
+
+
+
+
+    <!--https://stackoverflow.com/questions/31401669/thymeleaf-multiple-submit-button-in-one-form-->
+    <!--div class="row">
+        <div class="col-md-6" style="margin-top:1px">
+            <input type="text" class="form-control" placeholder="search movie" id="searchCriteriaMovie"/>
+            <br>
+            <a th:text="Search Movies" th:href="@{|/searchMovies/ + ${searchCriteriaMovie}|}"/>
+        </div>
+        <div class="col-md-6" style="margin-top:1px">
+            <input type="text" class="form-control" placeholder="search actor" id="searchActor"/>
+            <br>
+            <a href="/searchActors" class="btn btn-primary" role="button">Search Actors</a>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-md-6" style="margin-top:1px">
+            <a href="/listMovies" class="btn btn-primary" role="button">List Movies</a>
+        </div>
+        <div class="col-md-6" style="margin-top:1px">
+            <a href="/listActors" class="btn btn-primary" role="button">List Actors</a>
+        </div>
+    </div-->
+
+    <!--<div class="row">-->
+        <!--<div class="col-md-6" style="margin-top:1px">-->
+            <!--<a href="/listMovies" class="btn btn-primary" role="button">List Movies</a>-->
+            <!--<a href="/listActors" class="btn btn-primary" role="button">List Actors</a>-->
+        <!--</div>-->
+    <!--</div>-->
+
+</div>
+</div>
+</body>
+</html>

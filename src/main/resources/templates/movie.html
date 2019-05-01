@@ -43,28 +43,27 @@
             <h2>Directors's</h2>
             <div th:if="${!movieAllInfo.directorsToMovie.isEmpty()}">
                 <div th:each="directorToMovie : ${movieAllInfo.directorsToMovie}">
-                    <p th:text="${directorToMovie.firstName} + ' ' + ${directorToMovie.lastName}"/>
+                    <a th:text="${directorToMovie.firstName} + ' ' + ${directorToMovie.lastName}" th:href="@{|/getPerson/${directorToMovie.personOid}|}"/>
                 </div>
             </div>
             <br>
             <h2>Actor's</h2>
             <div th:if="${!movieAllInfo.actorsToMovie.isEmpty()}">
                 <div th:each="actorToMovie : ${movieAllInfo.actorsToMovie}">
-                    <!--p th:text="'Name : ' +  ${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' AS ' ${actorToMovie.characterName}"/-->
                     <div th:if="${actorToMovie.characterName != null}">
-                        <p th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' As ' + ${actorToMovie.characterName}"/>
+                        <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' As ' + ${actorToMovie.characterName}" th:href="@{|/getPerson/${actorToMovie.personOid}|}"/>
                     </div>
                     <div th:if="${actorToMovie.characterName == null}">
-                        <p th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName}"/>
+                        <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName}" th:href="@{|/getPerson/${actorToMovie.personOid}|}"/>
                     </div>
                 </div>
             </div>
         </div>
         <br>
         <div class="row">
-            <form action="#" th:action="@{/getMovies}" method="post">
+            <form action="#" th:action="@{/movieHome}" method="post">
                 <div class="col-md-6" style="margin-top:1px">
-                    <button type="submit" class="btn btn-primary">Back</button>
+                    <button type="submit" class="btn btn-primary">Home</button>
                 </div>
             </form>
         </div>
