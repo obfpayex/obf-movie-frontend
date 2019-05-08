@@ -18,42 +18,38 @@
 <h1>Customer Form</h1>
 <div class="row">
     <div class="col-md-4">
-        <form action="#" th:action="@{/save-new-person}" th:object="${newMovie}" method="post">
+        <form action="#" th:action="@{/save-new-movie}" th:object="${newMovie}" method="post">
             <div class="form-group">
-                <label for="firstName">First name:</label>
-                <input type="text" class="form-control" placeholder="Enter first name" id="firstName" th:field="*{firstName}"/>
+                <label for="originalTitle">Original Title:</label>
+                <input type="text" class="form-control" placeholder="Enter Original Title" id="originalTitle" th:field="*{originalTitle}"/>
             </div>
             <div class="form-group">
-                <label for="middleName">Middle name:</label>
-                <input type="text" class="form-control" placeholder="Enter middleName" id="middleName" th:field="*{middleName}"/>
+                <label for="norwegianTitle">Norwegian Title:</label>
+                <input type="text" class="form-control" placeholder="Enter Norwegian Title" id="norwegianTitle" th:field="*{norwegianTitle}"/>
             </div>
             <div class="form-group">
-                <label for="lastName">Last name:</label>
-                <input type="text" class="form-control" placeholder="Enter lastName" id="lastName" th:field="*{lastName}"/>
+                <label for="runningTime">Running Time:</label>
+                <input type="text" class="form-control" placeholder="Enter Running Time in minutes" id="runningTime" th:field="*{runningTime}"/>
             </div>
             <div class="form-group">
-                <label for="born">Born:</label>
-                <input type="text" class="form-control" placeholder="Format yyyy-MM-dd" id="born" th:field="*{born}"/>
+                <label for="releaseDate">Release date:</label>
+                <input type="text" class="form-control" placeholder="Enter Release date (yyyy-mm.dd)" id="releaseDate" th:field="*{releaseDate}"/>
             </div>
             <div class="form-group">
-                <label for="deceased">Deceased:</label>
-                <input type="text" class="form-control" placeholder="Format yyyy-MM-dd" id="deceased" th:field="*{deceased}"/>
+                <label for="ageLimit">Age limit:</label>
+                <input type="text" class="form-control" placeholder="Enter age limit" id="ageLimit" th:field="*{ageLimit}"/>
             </div>
             <div class="form-group">
-                <label for="picture">Picture:</label>
-                <input type="text" class="form-control" placeholder="Name Picture" id="picture" th:field="*{picture}"/>
+                <label for="productionYear">Production Year:</label>
+                <input type="text" class="form-control" placeholder="Enter Production Year" id="productionYear" th:field="*{productionYear}"/>
             </div>
             <div class="form-group">
-                <label for="gender">Gender:</label>
-                <input type="text" class="form-control" placeholder="Name gender (M/F/....." id="gender" th:field="*{gender}"/>
+                <label for="summary">summary:</label>
+                <input type="text" class="form-control" placeholder="summary" id="summary" th:field="*{summary}"/>
             </div>
             <div class="form-group">
-                <label for="bornName">BornName:</label>
-                <input type="text" class="form-control" placeholder="Name bornName" id="bornName" th:field="*{bornName}"/>
-            </div>
-            <div class="form-group">
-                <label for="bornName">Select born Country:</label>
-                <select th:field="*{bornCountryOid}">
+                <label for="categoryOid">Select category:</label>
+                <select id="categoryOid" th:field="*{categoryOid}">
                     <option value=""> -- </option>
                     <option th:each="category : ${categories}"
                             th:value="${category.oid}"

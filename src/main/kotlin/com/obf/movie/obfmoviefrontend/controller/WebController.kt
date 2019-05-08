@@ -21,9 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 @Controller
 class WebController(private val restTemplate: RestTemplate,
                     private val movieService: MovieService,
-                    private val personService: PersonService,
-                    private val countryService: CountryService,
-                    private val categoryService: CategoryService) {
+                    private val personService: PersonService) {
 
     private val log = LoggerFactory.getLogger(WebController::class.java)
 
@@ -37,51 +35,9 @@ class WebController(private val restTemplate: RestTemplate,
         return "index"
     }
 
-
-    @PostMapping("/movieHome")
-    fun movieHome(model: Model): String {
-        return setUpMovieHome(model, "")
-    }
-
-    @GetMapping("/listMovies")
-    fun listMovies(model: Model): String {
-        val movies = movieService.getAllMovies(restTemplate)
-        model.addAttribute("movieList", movies)
-        return "movies"
-    }
-
-    @RequestMapping("/getMovie/{oid}")
-    fun getMovie(@PathVariable oid: Long, model: Model): String {
-        return setUpMovie(model, oid)
-    }
-
-    @RequestMapping("/getPerson/{oid}")
-    fun getPerson(@PathVariable oid: Long, model: Model): String {
-        return setUpOnePerson(model, oid)
-    }
-
-    @GetMapping("/add-movie")
-    fun addMovie(model: Model): String {
-        model.addAttribute("newMovie", NewMovie())
-        model.addAttribute("categories",categoryService.getAllCategories(restTemplate))
-        return "addMovies"
-    }
-
-    @GetMapping("/add-person")
-    fun addPerson(model: Model): String {
-        model.addAttribute("newPerson", NewPerson())
-        model.addAttribute("countries",countryService.getAllCountries(restTemplate))
-        return "addperson"
-    }
-
     @PostMapping("/search")
     fun search(@ModelAttribute("search") search: Search, model: Model): String {
         return handelSearch(search, model)
-    }
-
-    @PostMapping("/save-new-person")
-    fun addNewPerson(@ModelAttribute("newPerson") newPerson: NewPerson, model: Model): String {
-        return personService.saveNewPerson(restTemplate, newPerson, model)
     }
 
 
@@ -132,7 +88,7 @@ class WebController(private val restTemplate: RestTemplate,
             return setUpMovieHome(model, "No movies found with search criteria " + search.searchCriteria.orEmpty())
         }
         if (movies.size == 1) {
-            return setUpMovie(model, movies.get(0).oid)
+            return setUpMovie(model, movies.get(0).oid!!)
         }
         model.addAttribute("movieList", movies)
         return "movies"

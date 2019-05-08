@@ -10,5 +10,8 @@ object Constants {
     const val URL_Person = "http://localhost:20200/api/person"
     const val URL_SearchCountry = "http://localhost:20200/api/country"
     const val URL_SearchCategory = "http://localhost:20200/api/category"
+    const val URL_Movie = "http://localhost:20200/api/movie"
+    const val URL_MovieDelete = "http://localhost:20200/api/movie/"
+    const val URL_MovieAddCategory = "$URL_Movie/add-category"
 
 }

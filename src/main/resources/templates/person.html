@@ -25,6 +25,7 @@
         <div class="col-md-6" style="margin-top:1px">
             <p th:text="'Name : ' +  ${personAllInfo.person.firstName} + ' ' +  ${personAllInfo.person.lastName}"/>
             <p th:text="'born: ' +  ${#dates.format(personAllInfo.person.born, 'yyyy-MM-dd')}"/>
+            <p th:text="'Country: ' +  ${personAllInfo.country.title}"/>
 
         </div>
 

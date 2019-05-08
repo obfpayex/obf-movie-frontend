@@ -1,5 +1,7 @@
 package com.obf.movie.obfmoviefrontend.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.obf.movie.obfmoviefrontend.model.NewPerson
 import com.obf.movie.obfmoviefrontend.model.Person
 import com.obf.movie.obfmoviefrontend.model.PersonAllInfo
@@ -9,11 +11,6 @@ import org.springframework.http.*
 import org.springframework.stereotype.Service
 import org.springframework.ui.Model
 import org.springframework.web.client.RestTemplate
-import java.lang.StringBuilder
-import org.springframework.http.HttpEntity
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import org.thymeleaf.expression.Lists
 
 
 @Service
@@ -44,7 +41,7 @@ class PersonService {
 
         val names = name.split(" ")
 
-        if (names.size > 1){
+        if (names.size > 1) {
             when {
                 names.size == 2 -> {
                     urlParameters.append("?firstName=").append(names[0])
@@ -58,14 +55,14 @@ class PersonService {
                 else -> {
                     urlParameters.append("?firstName=").append(names[0])
                     urlParameters.append("&middleName=")
-                    for (i in 1..names.size-2) {
-                        if (i > 1){
+                    for (i in 1..names.size - 2) {
+                        if (i > 1) {
                             urlParameters.append(" ")
                         }
                         urlParameters.append(names[i])
                     }
 
-                    urlParameters.append("&lastName=").append(names[names.size-1])
+                    urlParameters.append("&lastName=").append(names[names.size - 1])
                 }
             }
             urlParameters.append("&useOr=false")
@@ -97,9 +94,8 @@ class PersonService {
 
         if (result?.statusCode === HttpStatus.CREATED && result.hasBody()) {
             val jsonResult = result.body as String
-            val person : Person = ObjectMapper().readValue(jsonResult)
-            val personAllInfo = PersonAllInfo(person, ArrayList(), ArrayList())
-            model.addAttribute("personAllInfo", personAllInfo)
+            val person: Person = ObjectMapper().readValue(jsonResult)
+            model.addAttribute("personAllInfo", getAllInfoOnePerson(restTemplate, person.oid!!))
 
         } else {
             throw Exception("Could not save person")

@@ -52,8 +52,8 @@
                 <input type="text" class="form-control" placeholder="Name bornName" id="bornName" th:field="*{bornName}"/>
             </div>
             <div class="form-group">
-                <label for="bornName">Select born Country:</label>
-                <select th:field="*{bornCountryOid}">
+                <label for="bornCountryOid">Select born Country:</label>
+                <select id="bornCountryOid" th:field="*{bornCountryOid}">
                     <option value=""> -- </option>
                     <option th:each="country : ${countries}"
                             th:value="${country.oid}"

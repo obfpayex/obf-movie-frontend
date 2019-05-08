@@ -28,6 +28,7 @@
             <p th:text="'Age Limit: ' +  ${movieAllInfo.movie.ageLimit} + ' year'"/>
             <p th:text="'Production Year: ' +  ${movieAllInfo.movie.productionYear}"/>
             <p th:text="'Length: ' +  ${movieAllInfo.movie.runningTime} + ' min'"/>
+            <!--p th:text="'Release date: ' +  ${dates.format(movieAllInfo.movie.releaseDate, 'yyyy-MM-dd')}"/-->
             <p th:text="'Release date: ' +  ${movieAllInfo.movie.releaseDate}"/>
             <p th:text="'Summary: '"/>
             <p th:text="${movieAllInfo.movie.summary}"/>
@@ -37,37 +38,74 @@
             <div th:if="${movieAllInfo.categoriesAsString != null}">
                 <p th:text="${movieAllInfo.categoriesAsString}"/>
             </div>
+            <br>
+            <a href="/movieHome" class="btn btn-primary" role="button">Add Category</a>
         </div>
 
         <div class="col-md-6" style="margin-top:1px">
             <h2>Directors's</h2>
             <div th:if="${!movieAllInfo.directorsToMovie.isEmpty()}">
                 <div th:each="directorToMovie : ${movieAllInfo.directorsToMovie}">
-                    <a th:text="${directorToMovie.firstName} + ' ' + ${directorToMovie.lastName}" th:href="@{|/getPerson/${directorToMovie.personOid}|}"/>
+                    <a th:text="${directorToMovie.firstName} + ' ' + ${directorToMovie.lastName}"
+                       th:href="@{|/getPerson/${directorToMovie.personOid}|}"/>
                 </div>
             </div>
+            <br>
+            <a href="/movieHome" class="btn btn-primary" role="button">Add Director</a>
+            <br>
             <br>
             <h2>Actor's</h2>
             <div th:if="${!movieAllInfo.actorsToMovie.isEmpty()}">
                 <div th:each="actorToMovie : ${movieAllInfo.actorsToMovie}">
                     <div th:if="${actorToMovie.characterName != null}">
-                        <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' As ' + ${actorToMovie.characterName}" th:href="@{|/getPerson/${actorToMovie.personOid}|}"/>
+                        <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' As ' + ${actorToMovie.characterName}"
+                           th:href="@{|/getPerson/${actorToMovie.personOid}|}"/>
                     </div>
                     <div th:if="${actorToMovie.characterName == null}">
-                        <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName}" th:href="@{|/getPerson/${actorToMovie.personOid}|}"/>
+                        <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName}"
+                           th:href="@{|/getPerson/${actorToMovie.personOid}|}"/>
                     </div>
                 </div>
             </div>
+            <br>
+            <a href="/movieHome" class="btn btn-primary" role="button">Add Actor</a>
         </div>
         <br>
-        <div class="row">
-            <form action="#" th:action="@{/movieHome}" method="post">
-                <div class="col-md-6" style="margin-top:1px">
-                    <button type="submit" class="btn btn-primary">Home</button>
-                </div>
-            </form>
+
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-2" style="margin-top:1px">
+            <a href="/movieHome" class="btn btn-primary" role="button">Home</a>
+        </div>
+        <div class="col-md-2" style="margin-top:1px">
+            <div><a data-toggle="modal" data-target="#modal-warning"
+                    th:attr="data-target='#modal-warning'+${movieAllInfo.movie.oid }" class="btn btn-danger">Delete</a>
+            </div>
         </div>
     </div>
 </div>
 </body>
+
+<div class="modal modal-warning fade in" th:id="modal-warning+${movieAllInfo.movie.oid }">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h5 class="modal-title">Delete Movie</h5>
+            </div>
+            <div class="modal-body">
+                <h3>Are you sure want to delete this movie?</h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                <a type="button" class="btn btn-outline" th:href="@{/deleteMovie/{id}(id=${movieAllInfo.movie.oid})}"><i
+                        class="fa fa-check"></i>&nbsp;Yes</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 </html>
