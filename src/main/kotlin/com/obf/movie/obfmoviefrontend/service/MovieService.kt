@@ -15,7 +15,9 @@ import org.springframework.web.client.RestTemplate
 inline fun <reified T : Any> typeRef(): ParameterizedTypeReference<T> = object : ParameterizedTypeReference<T>() {}
 
 @Service
-class MovieService {
+class MovieService(private val personService: PersonService,
+                   private val roleService: RoleService,
+                   private val restTemplate: RestTemplate) {
 
     private val log = LoggerFactory.getLogger(MovieService::class.java)
     fun getAllMovies(restTemplate: RestTemplate): List<Movie> {
@@ -43,7 +45,7 @@ class MovieService {
                 HttpEntity("parameters", headers),
                 typeRef<Movie>())
 
-        if (result?.statusCode === HttpStatus.OK && result.hasBody()) {
+        if (result.statusCode === HttpStatus.OK && result.hasBody()) {
             return result.body as Movie
         } else {
             throw Exception("Could not find movie with oid : " + oid);
@@ -60,7 +62,7 @@ class MovieService {
                 HttpEntity("parameters", headers),
                 typeRef<MovieAllInfo>())
 
-        if (result?.statusCode === HttpStatus.OK && result.hasBody()) {
+        if (result.statusCode === HttpStatus.OK && result.hasBody()) {
             return convertMovieAllInfo(result)
         } else {
             throw Exception("Could not find movie with oid : " + oid)
@@ -79,7 +81,7 @@ class MovieService {
                 HttpEntity("parameters", headers),
                 typeRef<MovieAllInfo>())
 
-        if (result?.statusCode === HttpStatus.OK && result.hasBody()) {
+        if (result.statusCode === HttpStatus.OK && result.hasBody()) {
             return convertLatestMovie(convertMovieAllInfo(result))
         } else {
             throw Exception("Some Thing went Wrong");
@@ -144,7 +146,7 @@ class MovieService {
         val json = ObjectMapper().writeValueAsString(copyNewMovie(newMovie))
         val entity = HttpEntity(json, headers)
         val result = restTemplate.postForEntity(Constants.URL_Movie, entity, String::class.java)
-        if (result?.statusCode == HttpStatus.CREATED && result.hasBody()) {
+        if (result.statusCode == HttpStatus.CREATED && result.hasBody()) {
             val jsonResult = result.body as String
             val movie: Movie = ObjectMapper().readValue(jsonResult)
 
@@ -163,7 +165,7 @@ class MovieService {
             val jsonCat = ObjectMapper().writeValueAsString(movieCategory)
             val entityCat = HttpEntity(jsonCat, headers)
             val resultCat = restTemplate.postForEntity(Constants.URL_MovieAddCategory, entityCat, String::class.java)
-            if (result?.statusCode != HttpStatus.CREATED) {
+            if (result.statusCode != HttpStatus.CREATED) {
                 throw java.lang.Exception("Category " + newMovie.categoryOid!! + " was not saved om movie " + movie.oid!!)
             }
         }
@@ -180,5 +182,64 @@ class MovieService {
         headers.set("Session-Id", null)
 
         restTemplate.delete(Constants.URL_MovieDelete + oid)
+    }
+
+    fun saveActorToMovie(restTemplate: RestTemplate, newActor: NewActor, model: Model): String {
+        val persons = personService.searchName(restTemplate,newActor.name!!)
+        if (persons.isEmpty()){
+            return setUpNewActor(newActor, persons, model)
+        } else if (persons.size == 1){
+            val person = persons[0]
+            return addChosenActorToMovie(newActor.movieOid, person.oid!!, newActor.roleTypeOid!!, newActor.characterName!!, model)
+        } else {
+            return setUpNewActor(newActor, persons, model)
+        }
+    }
+
+    private fun setUpNewActor(newActor: NewActor, persons: List<Person>, model: Model): String {
+        newActor.persons = persons
+        val roleTypes: List<RoleType>
+        roleTypes = arrayListOf()
+        model.addAttribute("roleTypes", roleTypes)
+        model.addAttribute("newActor", newActor)
+        return "newActor"
+    }
+
+
+    fun addActor(restTemplate: RestTemplate, movieOid: Long, personOid: Long): MoviePerson {
+        val headers = HttpHeaders()
+        headers.set("Session-Id", null)
+        headers.contentType = MediaType.APPLICATION_JSON;
+        val moviePerson = MoviePerson(null,movieOid,personOid)
+
+        val json = ObjectMapper().writeValueAsString(moviePerson)
+        val entity = HttpEntity(json, headers)
+        val result = restTemplate.postForEntity(Constants.URL_MovieAddActor, entity, String::class.java)
+
+        if (result.statusCode === HttpStatus.CREATED && result.hasBody()) {
+            val jsonResult = result.body as String
+            return ObjectMapper().readValue(jsonResult)
+        } else {
+            throw Exception("Could not save person")
+        }
+    }
+
+    fun setUpMovie( model: Model, oid: Long): String {
+        model.addAttribute("movieAllInfo", getAllInfoOneMovie(restTemplate, oid))
+        model.addAttribute("newActor", NewActor())
+        return "movie"
+    }
+
+    fun addChosenActorToMovie(movieOid: Long, personOid: Long, roleTypeOid: Long, charachter: String, model: Model): String {
+        val moviePerson = addActor(restTemplate,movieOid,personOid)
+        val role = Role(null,charachter, moviePerson.oid!!, roleTypeOid)
+
+        roleService.addRole(restTemplate,role)
+        return setUpMovie(model,movieOid)
+    }
+
+    fun addActorToMovieAsNew(movieOid: Long, name: String, roleTypeOid: Long, charachter: String, model: Model): String {
+        val person = personService.saveNewPerson(name)
+        return addChosenActorToMovie(movieOid, person.oid!!, roleTypeOid, charachter, model)
     }
 }

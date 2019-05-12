@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate
 
 
 @Service
-class PersonService {
+class PersonService (private val restTemplate: RestTemplate){
 
     fun getAllInfoOnePerson(restTemplate: RestTemplate, oid: Long): PersonAllInfo {
         val headers = HttpHeaders()
@@ -84,6 +84,12 @@ class PersonService {
     }
 
     fun saveNewPerson(restTemplate: RestTemplate, newPerson: NewPerson, model: Model): String {
+        val person = saveNewPersonDb(newPerson)
+        model.addAttribute("personAllInfo", getAllInfoOnePerson(restTemplate, person.oid!!))
+        return "person"
+    }
+
+    fun saveNewPersonDb(newPerson: NewPerson): Person {
         val headers = HttpHeaders()
         headers.set("Session-Id", null)
         headers.contentType = MediaType.APPLICATION_JSON;
@@ -95,11 +101,49 @@ class PersonService {
         if (result?.statusCode === HttpStatus.CREATED && result.hasBody()) {
             val jsonResult = result.body as String
             val person: Person = ObjectMapper().readValue(jsonResult)
-            model.addAttribute("personAllInfo", getAllInfoOnePerson(restTemplate, person.oid!!))
+            return person
 
         } else {
             throw Exception("Could not save person")
         }
-        return "person"
+    }
+
+    fun saveNewPerson(name: String): Person {
+        var firstname = ""
+        var middleName = ""
+        var lastName = ""
+        val names = name.split(" ")
+
+        if (names.size > 1) {
+            when {
+                names.size == 2 -> {
+                    firstname = names[0]
+                    lastName = names[1]
+                }
+                names.size == 3 -> {
+                    firstname = names[0]
+                    middleName = names[1]
+                    lastName = names[2]
+                }
+                else -> {
+                    firstname = names[0]
+                    for (i in 1..names.size - 2) {
+                        if (i > 1) {
+                            middleName = middleName +" "
+                        }
+                        middleName = middleName + names[i]
+                    }
+                    lastName = names[names.size - 1]
+                }
+            }
+        } else {
+            lastName = name
+        }
+
+
+        val newPerson = NewPerson(null,firstname,lastName,null,null,null,null,null,middleName,name)
+
+        return saveNewPersonDb(newPerson)
+
     }
 }

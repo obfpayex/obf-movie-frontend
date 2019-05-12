@@ -15,7 +15,7 @@ class WebControllerPerson(private val restTemplate: RestTemplate,
 
 
 
-    @RequestMapping("/getPerson/{oid}")
+    @RequestMapping("/get-person/{oid}")
     fun getPerson(@PathVariable oid: Long, model: Model): String {
         return setUpOnePerson(model, oid)
     }

@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Actor</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+    <style>
+        p {
+            margin: 0
+        }
+    </style>
+</head>
+<body class="container">
+<h1>Add Actor form</h1>
+<div class="row">
+    <div class="col-md-4">
+        <form action="#" th:action="@{/save-actor-to-movie}" th:object="${newActor}" method="post">
+
+            <div class="form-group">
+                <label for="movieOid">Movie Oid</label>
+                <input type="text" class="form-control" id="movieOid" th:field="*{movieOid}"/>
+            </div>
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" placeholder="Enter name" id="name" th:field="*{name}"/>
+            </div>
+            <div class="form-group">
+                <label for="characterName">Character name:</label>
+                <input type="text" class="form-control" placeholder="Enter characterName" id="characterName"
+                       th:field="*{characterName}"/>
+            </div>
+            <div th:if="${!roleTypes.isEmpty()}">
+                <div class="form-group">
+                    <label for="roleTypeOid">Select Role Type:</label>
+                    <select id="roleTypeOid" th:field="*{roleTypeOid}">
+                        <option value=""> --</option>
+                        <option th:each="roleType : ${roleTypes}"
+                                th:value="${roleType.oid}"
+                                th:utext="${roleType.title}">
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="reset" class="btn btn-primary">Cancel</button>
+        </form>
+        <br>
+        <div th:if="${!newActor.persons.isEmpty()}">
+            <br>
+            <h2>Multipe hist of Actors, choose one</h2>
+            <div th:each="person : ${newActor.persons}">
+
+                <a th:text="${person.firstName} + ' ' + ${person.lastName}"
+                   th:href="@{'/save-chosen-actor-to-movie/'+ ${newActor.movieOid} + '/' + ${person.oid} + '/' + ${newActor.roleTypeOid}+ '/' + ${newActor.characterName}}"/>
+            </div>
+
+            <br>
+
+        </div>
+        <div th:if="${newActor.name != null}">
+            <h2>Or save as New</h2>
+            <a th:text="${newActor.name}"
+               th:href="@{'add-actor-to-movie-as-new/' + ${newActor.movieOid}+ '/' + ${newActor.name} + '/' + ${newActor.roleTypeOid}+ '/' + ${newActor.characterName}}"/>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
