@@ -46,12 +46,15 @@
                 </div>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
+            <!--form action="#" th:action="@{/movieHome}"  method="post">
+                <a th:href="@{|/add-actor-to-movie/${movieAllInfo.movie.oid}|}" class="btn btn-primary" role="button">Add Actor</a>
+                <a th:text="${movieToActor.productionYear} + '-' + ${movieToActor.originalTitle}" th:href="@{|/getMovie/${movieToActor.movieOid}|}"/-->
             <button type="reset" class="btn btn-primary">Cancel</button>
         </form>
         <br>
         <div th:if="${!newActor.persons.isEmpty()}">
             <br>
-            <h2>Multipe hist of Actors, choose one</h2>
+            <h2>Multipe hits of Actors, choose one</h2>
             <div th:each="person : ${newActor.persons}">
 
                 <a th:text="${person.firstName} + ' ' + ${person.lastName}"

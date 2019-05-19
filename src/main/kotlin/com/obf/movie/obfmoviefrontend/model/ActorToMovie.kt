@@ -9,4 +9,5 @@ data class ActorToMovie(
         var characterName: String?,
         var roleOid: Long?,
         var roleTypeOid: Long?,
-        var roleType: String?)
+        var roleType: String?,
+        var movieActorOid: Long)

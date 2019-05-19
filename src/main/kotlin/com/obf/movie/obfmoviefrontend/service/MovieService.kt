@@ -206,7 +206,13 @@ class MovieService(private val personService: PersonService,
     }
 
 
-    fun addActor(restTemplate: RestTemplate, movieOid: Long, personOid: Long): MoviePerson {
+    private fun setUpNewDirector(newDirector: NewDirector, persons: List<Person>, model: Model): String {
+        newDirector.persons = persons
+        model.addAttribute("newDirector", newDirector)
+        return "newDirector"
+    }
+
+    fun addActorToMovie(restTemplate: RestTemplate, movieOid: Long, personOid: Long): MoviePerson {
         val headers = HttpHeaders()
         headers.set("Session-Id", null)
         headers.contentType = MediaType.APPLICATION_JSON;
@@ -231,7 +237,7 @@ class MovieService(private val personService: PersonService,
     }
 
     fun addChosenActorToMovie(movieOid: Long, personOid: Long, roleTypeOid: Long, charachter: String, model: Model): String {
-        val moviePerson = addActor(restTemplate,movieOid,personOid)
+        val moviePerson = addActorToMovie(restTemplate,movieOid,personOid)
         val role = Role(null,charachter, moviePerson.oid!!, roleTypeOid)
 
         roleService.addRole(restTemplate,role)
@@ -242,4 +248,79 @@ class MovieService(private val personService: PersonService,
         val person = personService.saveNewPerson(name)
         return addChosenActorToMovie(movieOid, person.oid!!, roleTypeOid, charachter, model)
     }
+
+    fun addChosenDirectorToMovie(movieOid: Long, personOid: Long, model: Model): String {
+        addDirectorToMovie(restTemplate,movieOid,personOid)
+        return setUpMovie(model,movieOid)
+    }
+
+    fun addDirectorToMovie(restTemplate: RestTemplate, movieOid: Long, personOid: Long){
+        val movieDirector = MovieDirector(null,movieOid,personOid)
+        postObjectNoReplyCreated(movieDirector, Constants.URL_MovieAddDirector)
+    }
+
+    fun addDirectorToMovieAsNew(movieOid: Long, name: String, model: Model): String {
+        val person = personService.saveNewPerson(name)
+        return addChosenDirectorToMovie(movieOid, person.oid!!, model)
+    }
+
+    fun saveDirectorToMovie(restTemplate: RestTemplate, newDirector: NewDirector, model: Model): String {
+        val persons = personService.searchName(restTemplate,newDirector.name!!)
+        if (persons.isEmpty()){
+            return setUpNewDirector(newDirector, persons, model)
+        } else if (persons.size == 1){
+            val person = persons[0]
+            return addChosenDirectorToMovie(newDirector.movieOid, person.oid!! , model)
+        } else {
+            return setUpNewDirector(newDirector, persons, model)
+        }
+    }
+
+    fun removeDirector(model: Model, movieDirectorOid: Long, movieOid: Long): String {
+        val directorToMovie = DirectorToMovie(null, null, null, 0, movieDirectorOid)
+
+        postObjectNoReplyOK(directorToMovie, Constants.URL_MovieRemoveDirector)
+
+        return setUpMovie(model, movieOid)
+    }
+
+
+
+
+    fun removeActor(model: Model, movieActorOid: Long, movieOid: Long): String {
+        val actorToMovie = ActorToMovie(null,null,null,0, null, null,null, null, movieActorOid)
+        postObjectNoReplyOK(actorToMovie, Constants.URL_MovieRemoveActor)
+
+        return setUpMovie(model, movieOid)
+    }
+
+
+    private fun postObjectNoReplyCreated(request: Any, url: String ) {
+        val result = postObject(request, url)
+
+        if (!(result.statusCode === HttpStatus.CREATED)) {
+            throw Exception("Error executing post request fro create:" +result.statusCode)
+        }
+    }
+
+    private fun postObjectNoReplyOK(request: Any, url: String ) {
+        val result = postObject(request, url)
+
+        if (!(result.statusCode === HttpStatus.OK)) {
+            throw Exception("Error executing post request:" +result.statusCode)
+        }
+    }
+
+    private fun postObject(request: Any, url: String): ResponseEntity<String> {
+        val headers = HttpHeaders()
+        headers.set("Session-Id", null)
+        headers.contentType = MediaType.APPLICATION_JSON;
+
+
+        val json = ObjectMapper().writeValueAsString(request)
+        val entity = HttpEntity(json, headers)
+        val result = restTemplate.postForEntity(url, entity, String::class.java)
+        return result
+    }
+
 }

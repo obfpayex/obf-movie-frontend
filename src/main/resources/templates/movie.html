@@ -61,12 +61,22 @@
             <h2>Directors's</h2>
             <div th:if="${!movieAllInfo.directorsToMovie.isEmpty()}">
                 <div th:each="directorToMovie : ${movieAllInfo.directorsToMovie}">
-                    <a th:text="${directorToMovie.firstName} + ' ' + ${directorToMovie.lastName}"
-                       th:href="@{|/get-person/${directorToMovie.personOid}|}"/>
+                    <a th:text="${directorToMovie.firstName} + ' ' + ${directorToMovie.lastName}" th:href="@{|/get-person/${directorToMovie.personOid}|}"/>
+                    <a th:href="@{'/remove-director/' + ${directorToMovie.movieDirectorOid} + '/' + ${movieAllInfo.movie.oid}} " style="color: red">&nbsp;&nbsp;&nbsp;Remove</a>
                 </div>
+
+                <!--a th:href="@{|/get-person}"><i class="fa fa-square-o"></i></a>
+                <a th:href="@{|/get-person}"><i class="fa fa-trash"></i></a>
+
+
+
+                <div><a th:href="@{|/add-director-to-movie/${movieAllInfo.movie.oid}|}"><span class="glyphicon glyphicon-trash"></span>a</a></div>
+                <div><a th:href="@{|/add-director-to-movie/${movieAllInfo.movie.oid}|}"><span class="glyphicon glyphicon-trash"></span></a></div-->
+                <!--div><i class="fa fa-trash" aria-hidden="true"></i></div-->
+
             </div>
             <br>
-            <a href="/movieHome" class="btn btn-primary" role="button">Add Director</a>
+            <a th:href="@{|/add-director-to-movie/${movieAllInfo.movie.oid}|}" class="btn btn-primary" role="button">Add Director</a>
             <br>
             <br>
             <h2>Actor's</h2>
@@ -75,15 +85,16 @@
                     <div th:if="${actorToMovie.characterName != null}">
                         <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' As ' + ${actorToMovie.characterName}"
                            th:href="@{|/get-person/${actorToMovie.personOid}|}"/>
+                        <a th:href="@{'/remove-actor/' + ${actorToMovie.movieActorOid} + '/' + ${movieAllInfo.movie.oid}} " style="color: red">&nbsp;&nbsp;&nbsp;Remove</a>
                     </div>
                     <div th:if="${actorToMovie.characterName == null}">
                         <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName}"
                            th:href="@{|/get-person/${actorToMovie.personOid}|}"/>
+                        <a th:href="@{'/remove-actor/' + ${actorToMovie.movieActorOid} + '/' + ${movieAllInfo.movie.oid}} " style="color: red">&nbsp;&nbsp;&nbsp;Remove</a>
                     </div>
                 </div>
             </div>
             <br>
-            <!--a th:href="@{|/add-actor-to-movie/${movieAllInfo.movie.oid}|}" class="btn btn-primary" role="button">Add Actor</a-->
             <div>
                 <a th:href="@{|/add-actor-to-movie/${movieAllInfo.movie.oid}|}" class="btn btn-primary" role="button">Add Actor</a>
             </div>
@@ -126,7 +137,7 @@
 </div>
 
 
-<!--div class="modal fade" th:id="addActor" role="dialog">
+<!--div class="modal fade" th:id="addActorToMovie" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">

@@ -38,7 +38,7 @@
             <div th:if="${!movieAllInfoLatest.directorsToMovie.isEmpty()}">
                 <div th:each="directorToMovie : ${movieAllInfoLatest.directorsToMovie}">
                     <a th:text="${directorToMovie.firstName} + ' ' + ${directorToMovie.lastName}"
-                       th:href="@{|/getPerson/${directorToMovie.personOid}|}"/>
+                       th:href="@{|/get-person/${directorToMovie.personOid}|}"/>
                 </div>
             </div>
             <h4>Actor's</h4>
@@ -46,11 +46,11 @@
                 <div th:each="actorToMovie : ${movieAllInfoLatest.actorsToMovie}">
                     <div th:if="${actorToMovie.characterName != null}">
                         <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' As ' + ${actorToMovie.characterName}"
-                           th:href="@{|/getPerson/${actorToMovie.personOid}|}"/>
+                           th:href="@{|/get-person/${actorToMovie.personOid}|}"/>
                     </div>
                     <div th:if="${actorToMovie.characterName == null}">
                         <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName}"
-                           th:href="@{|/getPerson/${actorToMovie.personOid}|}"/>
+                           th:href="@{|/get-person/${actorToMovie.personOid}|}"/>
                     </div>
                 </div>
             </div>
