@@ -30,35 +30,52 @@
         </div>
 
         <div class="col-md-6" style="margin-top:1px">
+            <h2>Movies as Actor</h2>
             <div th:if="${!personAllInfo.moviesToActor.isEmpty()}">
-                <h2>Movies as Actor</h2>
                 <div th:each="movieToActor : ${personAllInfo.moviesToActor}">
-
                     <div th:if="${movieToActor.characterName != null}">
-                        <a th:text="${movieToActor.productionYear} + '-' + ${movieToActor.originalTitle} + ' as  ' + ${movieToActor.characterName}" th:href="@{|/getMovie/${movieToActor.movieOid}|}"/>
+                        <a th:text="${movieToActor.productionYear} + '-' + ${movieToActor.originalTitle} + ' as  ' + ${movieToActor.characterName}"
+                           th:href="@{|/getMovie/${movieToActor.movieOid}|}"/>
                     </div>
                     <div th:if="${movieToActor.characterName == null}">
-                        <a th:text="${movieToActor.productionYear} + '-' + ${movieToActor.originalTitle}" th:href="@{|/getMovie/${movieToActor.movieOid}|}"/>
+                        <a th:text="${movieToActor.productionYear} + '-' + ${movieToActor.originalTitle}"
+                           th:href="@{|/getMovie/${movieToActor.movieOid}|}"/>
                     </div>
                 </div>
             </div>
+            <br>
+            <h2>Movies as director</h2>
             <div th:if="${!personAllInfo.moviesToDirector.isEmpty()}">
-                <br>
-                <h2>Movies as director</h2>
                 <div th:each="movieToDirector : ${personAllInfo.moviesToDirector}">
-                    <a th:text="${movieToDirector.productionYear} + '-' + ${movieToDirector.originalTitle}" th:href="@{|/getMovie/${movieToDirector.movieOid}|}"/>
+                    <a th:text="${movieToDirector.productionYear} + '-' + ${movieToDirector.originalTitle}"
+                       th:href="@{|/getMovie/${movieToDirector.movieOid}|}"/>
                 </div>
             </div>
+            <br>
+
         </div>
         <br>
-        <div class="row">
-            <form action="#" th:action="@{/movieHome}" method="post">
-                <div class="col-md-6" style="margin-top:1px">
-                    <button type="submit" class="btn btn-primary">Home</button>
-                </div>
-            </form>
+    </div>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-md-2" style="margin-top:1px">
+            <a href="/movieHome" class="btn btn-primary" role="button">Home</a>
+        </div>
+        <div class="col-md-2" style="margin-top:1px">
+            <a th:href="@{|/edit-person/${personAllInfo.person.oid}|}" class="btn btn-primary" role="button">Edit</a>
+        </div>
+        <div class="col-md-2" style="margin-top:1px">
+            <a th:href="@{|/add-movieas-actor/${personAllInfo.person.oid}|}" class="btn btn-primary" role="button">Add
+                movie as Actor</a>
+        </div>
+        <div class="col-md-2" style="margin-top:1px">
+            <a th:href="@{|/add-movie-as-dierctor/${personAllInfo.person.oid}|}" class="btn btn-primary" role="button">Add
+                movie as director</a>
         </div>
     </div>
+
+
 </div>
 </body>
 </html>

@@ -12,9 +12,9 @@ import org.springframework.web.client.RestTemplate
 
 
 @Service
-class CountryService {
+class CountryService (private val restTemplate: RestTemplate){
     private val log = LoggerFactory.getLogger(MovieService::class.java)
-    fun getAllCountries(restTemplate: RestTemplate): List<Country> {
+    fun getAllCountries(): List<Country> {
 
         val headers = HttpHeaders()
         headers.set("Session-Id", null)

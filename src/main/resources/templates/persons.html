@@ -12,7 +12,7 @@
 <body class="container">
 <h1>Persons</h1>
 <div th:each="person : ${personList}">
-    <a th:text="${person.firstName}  + ' ' +${person.lastName}" th:href="@{|/getPerson/${person.oid}|}"></a>
+    <a th:text="${person.firstName}  + ' ' +${person.lastName}" th:href="@{|/get-person/${person.oid}|}"></a>
 </div>
 </body>
 </html>

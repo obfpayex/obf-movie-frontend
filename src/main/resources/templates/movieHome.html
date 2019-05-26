@@ -67,12 +67,16 @@
                 <button type="submit" class="btn btn-primary">Search</button>
             </div>
             <div class="col-md-3" style="margin-top:1px">
-                <input type="text" class="form-control" placeholder="movie/actor/all" id="searchType" th:field="*{searchType}"/>
-                <!--<select th:field="*{search.searchType}">-->
-                    <!--<option th:value="'ALL'" th:text="All"></option>-->
-                    <!--<option th:value="'MOVIE'" th:text="Movie"></option>-->
-                    <!--<option th:value="'PERSON'" th:text="Person"></option>-->
-                <!--</select>-->
+                <!--input type="text" class="form-control" placeholder="movie/actor/all" id="searchType" th:field="*{searchType}"/-->
+                <div class="form-group">
+                    <select id="searchType" th:field="*{searchType}">
+                        <option value=""> -- </option>
+                        <option th:each="searchTypeValue : ${search.searchTypes}"
+                                th:value="${searchTypeValue}"
+                                th:utext="${searchTypeValue}">
+                        </option>
+                    </select>
+                </div>
             </div>
         </div>
     </form>

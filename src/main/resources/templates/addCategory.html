@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Person</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+    <style>
+        p {
+            margin: 0
+        }
+    </style>
+</head>
+<body class="container">
+<h1>Customer Form</h1>
+<div class="row">
+    <div class="col-md-4">
+        <form action="#" th:action="@{/save-new-category}" th:object="${newCategory}" method="post">
+            <div class="form-group">
+                <label for="movieOid">Movie Oid</label>
+                <input type="text" class="form-control" id="movieOid" th:field="*{movieOid}"  />
+            </div>
+            <div class="form-group">
+                <label for="categoryOid">Select category:</label>
+                <select id="categoryOid" th:field="*{categoryOid}">
+                    <option value=""> -- </option>
+                    <option th:each="category : ${newCategory.categories}"
+                            th:value="${category.oid}"
+                            th:utext="${category.title}">
+                    </option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="reset" class="btn btn-primary">Cancel</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

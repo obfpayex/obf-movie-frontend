@@ -6,6 +6,7 @@ import com.obf.movie.obfmoviefrontend.model.NewPerson
 import com.obf.movie.obfmoviefrontend.model.Person
 import com.obf.movie.obfmoviefrontend.model.PersonAllInfo
 import com.obf.movie.obfmoviefrontend.util.Constants
+import com.obf.movie.obfmoviefrontend.util.Constants.URL_AllInfoPerson
 import com.obf.movie.obfmoviefrontend.util.Constants.URL_Person
 import org.springframework.http.*
 import org.springframework.stereotype.Service
@@ -14,14 +15,15 @@ import org.springframework.web.client.RestTemplate
 
 
 @Service
-class PersonService (private val restTemplate: RestTemplate){
+class PersonService (private val restTemplate: RestTemplate,
+                     private val countryService: CountryService){
 
     fun getAllInfoOnePerson(restTemplate: RestTemplate, oid: Long): PersonAllInfo {
         val headers = HttpHeaders()
         headers.set("Session-Id", null)
 
         val result: ResponseEntity<PersonAllInfo> = restTemplate.exchange(
-                "http://localhost:20200/api/person/complete-person-info/" + oid,
+                URL_AllInfoPerson + oid,
                 HttpMethod.GET,
                 HttpEntity("parameters", headers),
                 typeRef<PersonAllInfo>())
@@ -32,6 +34,24 @@ class PersonService (private val restTemplate: RestTemplate){
             throw Exception("Could not find actor with oid : " + oid)
         }
     }
+
+    fun getPerson(oid: Long): Person {
+        val headers = HttpHeaders()
+        headers.set("Session-Id", null)
+
+        val result: ResponseEntity<Person> = restTemplate.exchange(
+                "$URL_Person/$oid",
+                HttpMethod.GET,
+                HttpEntity("parameters", headers),
+                typeRef<Person>())
+
+        if (result?.statusCode === HttpStatus.OK && result.hasBody()) {
+            return result.body as Person
+        } else {
+            throw Exception("Could not find person with oid : " + oid)
+        }
+    }
+
 
     fun searchName(restTemplate: RestTemplate, name: String): List<Person> {
         val headers = HttpHeaders()
@@ -108,6 +128,18 @@ class PersonService (private val restTemplate: RestTemplate){
         }
     }
 
+    fun updatePersonDb(newPerson: NewPerson): Person {
+        val headers = HttpHeaders()
+        headers.set("Session-Id", null)
+        headers.contentType = MediaType.APPLICATION_JSON;
+
+        val person = copyNewPersonToPerson(newPerson)
+        val json = ObjectMapper().writeValueAsString(person)
+        val entity = HttpEntity(json, headers)
+        restTemplate.put(URL_Person, entity, String::class.java)
+        return person
+    }
+
     fun saveNewPerson(name: String): Person {
         var firstname = ""
         var middleName = ""
@@ -144,6 +176,44 @@ class PersonService (private val restTemplate: RestTemplate){
         val newPerson = NewPerson(null,firstname,lastName,null,null,null,null,null,middleName,name)
 
         return saveNewPersonDb(newPerson)
+
+    }
+
+    fun editPerson(model: Model, oid: Long): String {
+        model.addAttribute("newPerson",copyPersonToNewPerson(getPerson(oid)))
+        model.addAttribute("countries",countryService.getAllCountries())
+        return "editPerson"
+    }
+
+    fun updatePerson(newPerson: NewPerson, model: Model): String {
+
+        updatePersonDb(newPerson)
+
+        return setUpOnePerson(model, newPerson.oid!!)
+    }
+
+
+    fun setUpOnePerson(model: Model, oid: Long): String {
+        model.addAttribute("personAllInfo", getAllInfoOnePerson(restTemplate, oid))
+        return "person"
+    }
+
+    fun setUpAddPerson(model: Model): String {
+        model.addAttribute("newPerson", NewPerson())
+        model.addAttribute("countries", countryService.getAllCountries())
+        return "addperson"
+    }
+
+
+    fun copyPersonToNewPerson(person: Person): NewPerson{
+        val json = ObjectMapper().writeValueAsString(person);
+        return ObjectMapper().readValue<NewPerson>(json);
+
+    }
+
+    fun copyNewPersonToPerson(newPerson: NewPerson): Person{
+        val json = ObjectMapper().writeValueAsString(newPerson);
+        return ObjectMapper().readValue<Person>(json);
 
     }
 }

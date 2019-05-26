@@ -19,5 +19,8 @@ object Constants {
     const val URL_Role = "http://localhost:20200/api/role"
     const val URL_MovieRemoveDirector = "$URL_Movie/remove-director/"
     const val URL_MovieRemoveActor = "$URL_Movie/remove-actor/"
+    const val URL_AllInfoPerson = "http://localhost:20200/api/person/complete-person-info/"
+
+
 
 }

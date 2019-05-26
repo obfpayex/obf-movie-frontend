@@ -1,9 +1,6 @@
 package com.obf.movie.obfmoviefrontend.controller
 
-import com.obf.movie.obfmoviefrontend.model.NewActor
-import com.obf.movie.obfmoviefrontend.model.NewDirector
-import com.obf.movie.obfmoviefrontend.model.NewMovie
-import com.obf.movie.obfmoviefrontend.model.Search
+import com.obf.movie.obfmoviefrontend.model.*
 import com.obf.movie.obfmoviefrontend.service.CategoryService
 import com.obf.movie.obfmoviefrontend.service.CountryService
 import com.obf.movie.obfmoviefrontend.service.MovieService
@@ -46,8 +43,6 @@ class WebControllerMovie(private val restTemplate: RestTemplate,
     fun addActorToMovieAsNew(@PathVariable movieOid: Long, @PathVariable name: String , @PathVariable roleTypeOid: Long,@PathVariable charachter: String, model: Model): String {
         return movieService.addActorToMovieAsNew(movieOid, name,  roleTypeOid,charachter, model)
     }
-
-
 
 
 
@@ -101,8 +96,9 @@ class WebControllerMovie(private val restTemplate: RestTemplate,
 
 
     private fun setUpMovieHome(model: Model, message: String): String {
+        val searchTypes = listOf("movie","actor","all")
         model.addAttribute("movieAllInfoLatest", movieService.getLatestMovie(restTemplate))
-        model.addAttribute("search", Search())
+        model.addAttribute("search", Search(null,null,searchTypes))
         model.addAttribute("message", message)
         return "movieHome"
     }
@@ -127,4 +123,18 @@ class WebControllerMovie(private val restTemplate: RestTemplate,
         movieService.deleteMovie(restTemplate, oid)
         return setUpMovieHome(model, "")
     }
+
+
+    @RequestMapping("/add-category/{movieOid}")
+    fun getCategories(@PathVariable movieOid: Long, model: Model): String {
+        return movieService.addCategory(movieOid, model)
+    }
+
+    @PostMapping("/save-new-category")
+    fun saveNewCategory(@ModelAttribute("newCategory") newCategory: NewCategory, model: Model): String {
+        return movieService.saveNewCategory(newCategory, model)
+    }
+
+
+
 }

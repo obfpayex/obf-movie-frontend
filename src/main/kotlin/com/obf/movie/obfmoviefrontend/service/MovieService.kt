@@ -17,7 +17,8 @@ inline fun <reified T : Any> typeRef(): ParameterizedTypeReference<T> = object :
 @Service
 class MovieService(private val personService: PersonService,
                    private val roleService: RoleService,
-                   private val restTemplate: RestTemplate) {
+                   private val restTemplate: RestTemplate,
+                   private val categoryService: CategoryService) {
 
     private val log = LoggerFactory.getLogger(MovieService::class.java)
     fun getAllMovies(restTemplate: RestTemplate): List<Movie> {
@@ -150,25 +151,28 @@ class MovieService(private val personService: PersonService,
             val jsonResult = result.body as String
             val movie: Movie = ObjectMapper().readValue(jsonResult)
 
-            saveCategoryOnMovie(newMovie, movie, headers, restTemplate, result)
+            saveCategoryOnMovie(newMovie.categoryOid!!, movie.oid!!)
 
             model.addAttribute("movieAllInfo", getAllInfoOneMovie(restTemplate, movie.oid!!))
         } else {
-            throw Exception("Could not save person")
+            throw Exception("Could not save movie")
         }
         return "movie"
     }
 
-    private fun saveCategoryOnMovie(newMovie: NewMovie, movie: Movie, headers: HttpHeaders, restTemplate: RestTemplate, result: ResponseEntity<String>) {
-        if (newMovie.categoryOid != null) {
-            val movieCategory = MovieCategory(movie.oid!!, newMovie.categoryOid!!)
-            val jsonCat = ObjectMapper().writeValueAsString(movieCategory)
-            val entityCat = HttpEntity(jsonCat, headers)
-            val resultCat = restTemplate.postForEntity(Constants.URL_MovieAddCategory, entityCat, String::class.java)
-            if (result.statusCode != HttpStatus.CREATED) {
-                throw java.lang.Exception("Category " + newMovie.categoryOid!! + " was not saved om movie " + movie.oid!!)
-            }
+    private fun saveCategoryOnMovie(categoryOid: Long, movieOid: Long) {
+
+        val headers = HttpHeaders()
+        headers.set("Session-Id", null)
+        headers.contentType = MediaType.APPLICATION_JSON
+        val movieCategory = MovieCategory(movieOid, categoryOid)
+        val jsonCat = ObjectMapper().writeValueAsString(movieCategory)
+        val entityCat = HttpEntity(jsonCat, headers)
+        val resultCat = restTemplate.postForEntity(Constants.URL_MovieAddCategory, entityCat, String::class.java)
+        if (resultCat.statusCode != HttpStatus.OK) {
+            throw java.lang.Exception("Category " + categoryOid!! + " was not saved om movie " + movieOid)
         }
+
     }
 
     fun copyNewMovie(newMovie: NewMovie): Movie {
@@ -185,10 +189,10 @@ class MovieService(private val personService: PersonService,
     }
 
     fun saveActorToMovie(restTemplate: RestTemplate, newActor: NewActor, model: Model): String {
-        val persons = personService.searchName(restTemplate,newActor.name!!)
-        if (persons.isEmpty()){
+        val persons = personService.searchName(restTemplate, newActor.name!!)
+        if (persons.isEmpty()) {
             return setUpNewActor(newActor, persons, model)
-        } else if (persons.size == 1){
+        } else if (persons.size == 1) {
             val person = persons[0]
             return addChosenActorToMovie(newActor.movieOid, person.oid!!, newActor.roleTypeOid!!, newActor.characterName!!, model)
         } else {
@@ -216,7 +220,7 @@ class MovieService(private val personService: PersonService,
         val headers = HttpHeaders()
         headers.set("Session-Id", null)
         headers.contentType = MediaType.APPLICATION_JSON;
-        val moviePerson = MoviePerson(null,movieOid,personOid)
+        val moviePerson = MoviePerson(null, movieOid, personOid)
 
         val json = ObjectMapper().writeValueAsString(moviePerson)
         val entity = HttpEntity(json, headers)
@@ -230,18 +234,18 @@ class MovieService(private val personService: PersonService,
         }
     }
 
-    fun setUpMovie( model: Model, oid: Long): String {
+    fun setUpMovie(model: Model, oid: Long): String {
         model.addAttribute("movieAllInfo", getAllInfoOneMovie(restTemplate, oid))
         model.addAttribute("newActor", NewActor())
         return "movie"
     }
 
     fun addChosenActorToMovie(movieOid: Long, personOid: Long, roleTypeOid: Long, charachter: String, model: Model): String {
-        val moviePerson = addActorToMovie(restTemplate,movieOid,personOid)
-        val role = Role(null,charachter, moviePerson.oid!!, roleTypeOid)
+        val moviePerson = addActorToMovie(restTemplate, movieOid, personOid)
+        val role = Role(null, charachter, moviePerson.oid!!, roleTypeOid)
 
-        roleService.addRole(restTemplate,role)
-        return setUpMovie(model,movieOid)
+        roleService.addRole(restTemplate, role)
+        return setUpMovie(model, movieOid)
     }
 
     fun addActorToMovieAsNew(movieOid: Long, name: String, roleTypeOid: Long, charachter: String, model: Model): String {
@@ -250,12 +254,12 @@ class MovieService(private val personService: PersonService,
     }
 
     fun addChosenDirectorToMovie(movieOid: Long, personOid: Long, model: Model): String {
-        addDirectorToMovie(restTemplate,movieOid,personOid)
-        return setUpMovie(model,movieOid)
+        addDirectorToMovie(restTemplate, movieOid, personOid)
+        return setUpMovie(model, movieOid)
     }
 
-    fun addDirectorToMovie(restTemplate: RestTemplate, movieOid: Long, personOid: Long){
-        val movieDirector = MovieDirector(null,movieOid,personOid)
+    fun addDirectorToMovie(restTemplate: RestTemplate, movieOid: Long, personOid: Long) {
+        val movieDirector = MovieDirector(null, movieOid, personOid)
         postObjectNoReplyCreated(movieDirector, Constants.URL_MovieAddDirector)
     }
 
@@ -265,12 +269,12 @@ class MovieService(private val personService: PersonService,
     }
 
     fun saveDirectorToMovie(restTemplate: RestTemplate, newDirector: NewDirector, model: Model): String {
-        val persons = personService.searchName(restTemplate,newDirector.name!!)
-        if (persons.isEmpty()){
+        val persons = personService.searchName(restTemplate, newDirector.name!!)
+        if (persons.isEmpty()) {
             return setUpNewDirector(newDirector, persons, model)
-        } else if (persons.size == 1){
+        } else if (persons.size == 1) {
             val person = persons[0]
-            return addChosenDirectorToMovie(newDirector.movieOid, person.oid!! , model)
+            return addChosenDirectorToMovie(newDirector.movieOid, person.oid!!, model)
         } else {
             return setUpNewDirector(newDirector, persons, model)
         }
@@ -285,29 +289,27 @@ class MovieService(private val personService: PersonService,
     }
 
 
-
-
     fun removeActor(model: Model, movieActorOid: Long, movieOid: Long): String {
-        val actorToMovie = ActorToMovie(null,null,null,0, null, null,null, null, movieActorOid)
+        val actorToMovie = ActorToMovie(null, null, null, 0, null, null, null, null, movieActorOid)
         postObjectNoReplyOK(actorToMovie, Constants.URL_MovieRemoveActor)
 
         return setUpMovie(model, movieOid)
     }
 
 
-    private fun postObjectNoReplyCreated(request: Any, url: String ) {
+    private fun postObjectNoReplyCreated(request: Any, url: String) {
         val result = postObject(request, url)
 
         if (!(result.statusCode === HttpStatus.CREATED)) {
-            throw Exception("Error executing post request fro create:" +result.statusCode)
+            throw Exception("Error executing post request fro create:" + result.statusCode)
         }
     }
 
-    private fun postObjectNoReplyOK(request: Any, url: String ) {
+    private fun postObjectNoReplyOK(request: Any, url: String) {
         val result = postObject(request, url)
 
         if (!(result.statusCode === HttpStatus.OK)) {
-            throw Exception("Error executing post request:" +result.statusCode)
+            throw Exception("Error executing post request:" + result.statusCode)
         }
     }
 
@@ -321,6 +323,19 @@ class MovieService(private val personService: PersonService,
         val entity = HttpEntity(json, headers)
         val result = restTemplate.postForEntity(url, entity, String::class.java)
         return result
+    }
+
+    fun addCategory(movieOid: Long, model: Model): String {
+        val newCategory = NewCategory()
+        newCategory.categories = categoryService.getAllCategories(restTemplate)
+        newCategory.movieOid = movieOid
+        model.addAttribute("newCategory", newCategory)
+        return "addCategory"
+    }
+
+    fun saveNewCategory(newCategory: NewCategory, model: Model): String {
+        saveCategoryOnMovie(newCategory.categoryOid!!, newCategory.movieOid)
+        return setUpMovie(model,newCategory.movieOid)
     }
 
 }
