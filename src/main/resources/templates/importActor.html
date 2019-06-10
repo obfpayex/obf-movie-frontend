@@ -15,34 +15,38 @@
     </style>
 </head>
 <body class="container">
-<h2>Add Category</h2>
+<h1>Import Actor's</h1>
 <div class="row">
     <div class="col-md-4">
-        <form action="#" th:action="@{/save-new-category}" th:object="${newCategory}" method="post">
+        <form action="#" th:action="@{/import-actor}" th:object="${manage}" method="post">
             <div class="form-group">
                 <label for="movieOid">Movie Oid</label>
-                <input type="text" class="form-control" id="movieOid" th:field="*{movieOid}"  />
+                <input type="text" class="form-control" id="movieOid" th:field="*{oid}"/>
             </div>
-            <div class="form-group">
-                <label for="categoryOid">Select category:</label>
-                <select id="categoryOid" th:field="*{categoryOid}">
-                    <option value=""> -- </option>
-                    <option th:each="category : ${newCategory.categories}"
-                            th:value="${category.oid}"
-                            th:utext="${category.title}">
-                    </option>
-                </select>
+            <textarea name="news_content" rows="20" cols="80" th:field="*{text}"></textarea>
+            <div th:if="${!roleTypes.isEmpty()}">
+                <div class="form-group">
+                    <label for="number">Select Role Type:</label>
+                    <select id="number" th:field="*{number}">
+                        <option value="">0</option>
+                        <option th:each="roleType : ${roleTypes}"
+                                th:value="${roleType.oid}"
+                                th:utext="${roleType.title}">
+                        </option>
+                    </select>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary">Add</button>
+            <button type="submit" class="btn btn-primary">Save</button>
         </form>
     </div>
 </div>
 <br>
 <div class="row">
     <div class="col-md-4" style="margin-top:1px">
-        <a th:href="@{|/getMovie/${newCategory.movieOid}|}" class="btn btn-primary"
+        <a th:href="@{|/getMovie/${manage.oid}|}" class="btn btn-primary"
            role="button">Cancel</a>
     </div>
 </div>
+
 </body>
 </html>

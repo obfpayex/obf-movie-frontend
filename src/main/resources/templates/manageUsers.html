@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Movies</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+    <style>
+        p {
+            margin: 0
+        }
+    </style>
+</head>
+<body class="container">
+<div class="jumbotron">
+    <div class="row">
+        <div class="col-md-6" style="margin-top:1px">
+            <h2>Existing User's</h2>
+            <div th:if="${!users.isEmpty()}">
+                <div th:each="user : ${users}">
+                    <a th:text="${user.username}"
+                       th:href="@{|/get-user/${user.oid}|}"/>
+                    <a th:href="@{'/remove-user/' + ${user.oid}} "
+                       style="color: red">&nbsp;&nbsp;&nbsp;Remove</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-4" style="margin-top:1px">
+            <a th:href="@{|/main-page/|}" class="btn btn-primary"
+               role="button">Exit</a>
+        </div>
+    </div>
+</div>
+<br>
+<div class="jumbotron">
+    <div class="row">
+        <div class="col-md-6" style="margin-top:1px">
+            <h2>Add new user</h2>
+            <form action="#" th:action="@{/save-new-user}" th:object="${user}" method="post">
+                <div class="form-group">
+                    <label for="username">User name:</label>
+                    <input type="text" class="form-control" placeholder="Enter user name" id="username"
+                           th:field="*{username}"/>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" class="form-control" placeholder="Enter password" id="password"
+                           th:field="*{password}"/>
+                </div>
+                <div class="form-group">
+                    <label for="userLevel">User level:</label>
+                    <input type="text" class="form-control" placeholder="Enter userLevel (1-10)" id="userLevel"
+                           th:field="*{userLevel}"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-6" style="margin-top:1px">
+            <div th:if="${message != null && !message.isEmpty()}">
+                <p th:text="${message}"/>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+
+<!--<div class="modal modal-warning fade in" th:id="modal-warning+${oneUser.oid }">-->
+    <!--<div class="modal-dialog">-->
+        <!--<div class="modal-content">-->
+            <!--<div class="modal-header">-->
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+                    <!--<span aria-hidden="true">×</span></button>-->
+                <!--<h5 class="modal-title">Delete User</h5>-->
+            <!--</div>-->
+            <!--<div class="modal-body">-->
+                <!--<h3>Are you sure want to delete this user?</h3>-->
+            <!--</div>-->
+            <!--<div class="modal-footer">-->
+                <!--<button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>-->
+                <!--<a type="button" class="btn btn-outline" th:href="@{/remove-user/{id}(id=${oneUser.oid})}"><i-->
+                        <!--class="fa fa-check"></i>&nbsp;Yes</a>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+
+</html>

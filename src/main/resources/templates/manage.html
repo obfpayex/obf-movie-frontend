@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Person</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+    <style>
+        p {
+            margin: 0
+        }
+    </style>
+</head>
+<body class="container">
+<h1>Manage</h1>
+<div class="row">
+    <div class="col-md-4">
+        <form action="#" th:action="@{/add-new-category}" th:object="${manage}" method="post">
+            <h2>Manage Category</h2>
+            <div class="form-group">
+                <label for="text">new category</label>
+                <input type="text" class="form-control" placeholder="Enter new category" id="text" th:field="*{text}"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <hr style="border: 2px solid blue;"/>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <form action="#" th:action="@{/add-new-country}" th:object="${manage}" method="post">
+            <h2>Manage Category</h2>
+            <div class="form-group">
+                <label for="text">new country</label>
+                <input type="text" class="form-control" placeholder="Enter new country" id="text" th:field="*{text}"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <hr style="border: 2px solid blue;"/>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4" style="margin-top:1px">
+        <a th:href="@{|/movieHome|}" class="btn btn-primary"
+           role="button">Exit</a>
+    </div>
+</div>
+</body>
+</html>

@@ -2,9 +2,7 @@ package com.obf.movie.obfmoviefrontend.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.obf.movie.obfmoviefrontend.model.NewPerson
-import com.obf.movie.obfmoviefrontend.model.Person
-import com.obf.movie.obfmoviefrontend.model.PersonAllInfo
+import com.obf.movie.obfmoviefrontend.model.*
 import com.obf.movie.obfmoviefrontend.util.Constants
 import com.obf.movie.obfmoviefrontend.util.Constants.URL_AllInfoPerson
 import com.obf.movie.obfmoviefrontend.util.Constants.URL_Person
@@ -16,7 +14,9 @@ import org.springframework.web.client.RestTemplate
 
 @Service
 class PersonService (private val restTemplate: RestTemplate,
-                     private val countryService: CountryService){
+                     private val countryService: CountryService,
+                     private val moviePersonService: MoviePersonService,
+                     private val roleTypeService: RoleTypeService){
 
     fun getAllInfoOnePerson(restTemplate: RestTemplate, oid: Long): PersonAllInfo {
         val headers = HttpHeaders()
@@ -53,7 +53,7 @@ class PersonService (private val restTemplate: RestTemplate,
     }
 
 
-    fun searchName(restTemplate: RestTemplate, name: String): List<Person> {
+    fun searchName(name: String): List<Person> {
         val headers = HttpHeaders()
         headers.set("Session-Id", null)
         val urlParameters = StringBuilder()
@@ -215,5 +215,50 @@ class PersonService (private val restTemplate: RestTemplate,
         val json = ObjectMapper().writeValueAsString(newPerson);
         return ObjectMapper().readValue<Person>(json);
 
+    }
+
+    fun importActors(manage: Manage, model: Model): String {
+        var notAdded = ""
+
+        if (!manage.text.isNullOrEmpty()){
+            val lines = manage.text!!.split("\r\n")
+
+            for (line in lines){
+                val values = line.split(";")
+                val result = saveActorToMovie(values[1], values[2],manage.oid!!, manage.number!!)
+
+                if (!result.equals("")){
+                    notAdded = notAdded + values[1]
+                }
+            }
+        }
+        if (!notAdded.equals(""))
+            throw Exception("Could not save actors to movie " + notAdded)
+        return return "redirect:/getMovie/" + manage.oid
+    }
+
+
+    fun saveActorToMovie(name: String, characterName: String, movieOid: Long, number: Long): String {
+        val persons = searchName(name)
+        val person: Person
+        if (persons.isEmpty()) {
+            person = saveNewPerson(name)
+        } else if (persons.size == 1) {
+            person = persons[0]
+        } else {
+            return name
+        }
+        var defaultRoleType = 5L
+        if (number != 0L){
+            defaultRoleType = number
+        }
+        moviePersonService.addChosenActorToMovieDB(movieOid, person.oid!!, characterName, defaultRoleType)
+        return ""
+    }
+
+    fun setupLoadImportActor(oid: Long, model: Model): String {
+        model.addAttribute("manage", Manage(oid, null, null))
+        model.addAttribute("roleTypes", roleTypeService.getAllRoleType())
+        return "importActor"
     }
 }

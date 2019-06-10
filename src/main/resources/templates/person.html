@@ -23,12 +23,23 @@
     </div>
     <div class="row">
         <div class="col-md-6" style="margin-top:1px">
+
             <p th:text="'Name : ' +  ${personAllInfo.person.firstName} + ' ' +  ${personAllInfo.person.lastName}"/>
             <p th:text="'born: ' +  ${#dates.format(personAllInfo.person.born, 'yyyy-MM-dd')}"/>
             <p th:text="'Country: ' +  ${personAllInfo.country.title}"/>
-
+            <br>
+            <br>
+            <div class="row">
+                <div class="col-md-3" style="margin-top:1px">
+                    <a href="/movieHome" class="btn btn-primary" role="button">Home</a>
+                </div>
+                <div class="col-md-3" style="margin-top:1px">
+                    <a th:href="@{|/edit-person/${personAllInfo.person.oid}|}" class="btn btn-primary" role="button">Edit</a>
+                </div>
+                <div class="col-md-6" style="margin-top:1px">&nbsp;</div>
+            </div>
+            <br>
         </div>
-
         <div class="col-md-6" style="margin-top:1px">
             <h2>Movies as Actor</h2>
             <div th:if="${!personAllInfo.moviesToActor.isEmpty()}">
@@ -58,22 +69,6 @@
     </div>
     <br>
     <br>
-    <div class="row">
-        <div class="col-md-2" style="margin-top:1px">
-            <a href="/movieHome" class="btn btn-primary" role="button">Home</a>
-        </div>
-        <div class="col-md-2" style="margin-top:1px">
-            <a th:href="@{|/edit-person/${personAllInfo.person.oid}|}" class="btn btn-primary" role="button">Edit</a>
-        </div>
-        <div class="col-md-2" style="margin-top:1px">
-            <a th:href="@{|/add-movieas-actor/${personAllInfo.person.oid}|}" class="btn btn-primary" role="button">Add
-                movie as Actor</a>
-        </div>
-        <div class="col-md-2" style="margin-top:1px">
-            <a th:href="@{|/add-movie-as-dierctor/${personAllInfo.person.oid}|}" class="btn btn-primary" role="button">Add
-                movie as director</a>
-        </div>
-    </div>
 
 
 </div>

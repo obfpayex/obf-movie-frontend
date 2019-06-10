@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 
 @Service
-class RoleTypeService {
-    fun getAllRoleType(restTemplate: RestTemplate): List<RoleType> {
+class RoleTypeService (private val restTemplate: RestTemplate){
+    fun getAllRoleType(): List<RoleType> {
 
         val headers = HttpHeaders()
         headers.set("Session-Id", null)

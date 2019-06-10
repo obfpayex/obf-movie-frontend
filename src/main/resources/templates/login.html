@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Person</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+    <style>
+        p {
+            margin: 0
+        }
+    </style>
+</head>
+<body class="container">
+<div class="jumbotron">
+    <div class="row">
+        <div class="col-md-4">
+            <h1>Login page</h1>
+            <p th:if="${login.loginError != ''}" class="error">Wrong user or password</p>
+            <!--div th:if="${!login.loginError == null}">
+            </div-->
+            <!--https://www.thymeleaf.org/doc/articles/springsecurity.html
+            https://stackoverflow.com/questions/21936788/spring-mvc-how-to-store-user-in-the-session-and-retrieve-it-->
+            <form th:action="@{/login}" th:object="${login}" method="post">
+                <!--label for="username">Username</label>:
+                <input type="text" id="username" name="username" autofocus="autofocus"/> <br/>
+                <label for="password">Password</label>:
+                <input type="password" id="password" name="password"/> <br/>
+                <input type="submit" value="Log in"/-->
+                <div class="form-group">
+                    <label for="username">username:</label>
+                    <input type="text" class="form-control" placeholder="username" id="username" th:field="*{username}"/>
+                </div>
+                <div class="form-group">
+                    <label for="password">password:</label>
+                    <input type="password" class="form-control" placeholder="password" id="password" th:field="*{password}"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Log in</button>
+            </form>
+            <br>
+            <a th:href="@{|/login-guest|}" class="btn btn-primary" role="button">Enter as guest</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

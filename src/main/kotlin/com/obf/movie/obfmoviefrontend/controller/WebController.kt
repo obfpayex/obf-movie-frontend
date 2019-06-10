@@ -1,102 +1,148 @@
 package com.obf.movie.obfmoviefrontend.controller
 
-import com.obf.movie.obfmoviefrontend.model.NewMovie
-import com.obf.movie.obfmoviefrontend.model.NewPerson
-import com.obf.movie.obfmoviefrontend.model.Person
-import com.obf.movie.obfmoviefrontend.model.Search
-import com.obf.movie.obfmoviefrontend.service.CategoryService
-import com.obf.movie.obfmoviefrontend.service.CountryService
-import com.obf.movie.obfmoviefrontend.service.PersonService
-import com.obf.movie.obfmoviefrontend.service.MovieService
+import com.obf.movie.obfmoviefrontend.model.*
+import com.obf.movie.obfmoviefrontend.service.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.client.RestTemplate
 import org.springframework.web.bind.annotation.RequestMapping
-
-
+import java.lang.Exception
+import javax.servlet.http.HttpSession
 
 
 @Controller
-class WebController(private val restTemplate: RestTemplate,
+class WebController(private val mainService: MainService,
                     private val movieService: MovieService,
-                    private val personService: PersonService) {
+                    private val categoryService: CategoryService,
+                    private val countryService: CountryService,
+                    private val userService: UserService) {
 
     private val log = LoggerFactory.getLogger(WebController::class.java)
 
     @GetMapping("/")
     fun home(): String {
-        return "redirect:/index"
+        return "redirect:/login-page"
     }
 
     @GetMapping("/index")
     fun customerForm(model: Model): String {
-        return "index"
+        return "redirect:/login-page"
+    }
+
+
+    @GetMapping("/main-page")
+    fun mainPage(model: Model, httpSession: HttpSession): String {
+
+        return when {
+            !userService.checkUser(httpSession, model) -> "redirect:/login-page"
+            else -> {
+                mainService.setupMainPage(httpSession, model)
+            }
+        }
+    }
+
+
+    @GetMapping("/manage")
+    fun manage(model: Model, httpSession: HttpSession): String {
+        return when {
+            !userService.checkUser(httpSession,model) -> "redirect:/login-page"
+            else -> if (userService.checkUserLevel(httpSession, 5)){mainService.setUpManage(model)} else {"redirect:/movieHome"}
+        }
+
+    }
+
+    @GetMapping("/login-guest")
+    fun loginGuest(model: Model, httpSession: HttpSession): String {
+
+        var loggedOnUser = LoggedOnUser("guest", 0, 1)
+        model.addAttribute("user", loggedOnUser)
+        httpSession.setAttribute("user", loggedOnUser)
+        return "mainPage"
+    }
+
+    @PostMapping("/login")
+    fun loginError(@ModelAttribute("login") login: Login, model: Model, httpSession: HttpSession): String {
+        var loggedOnUser: LoggedOnUser
+        try {
+            loggedOnUser = userService.getAndCheckUser(login.password, login.username)
+        } catch (e: Exception) {
+            login.loginError = "Wrong user or password"
+            model.addAttribute("login", login)
+            return "login"
+        }
+        model.addAttribute("user", loggedOnUser)
+        httpSession.setAttribute("user", loggedOnUser)
+        return "mainPage"
+    }
+
+
+    @PostMapping("/add-new-category")
+    fun addNewCategory(@ModelAttribute("manage") manage: Manage, model: Model, httpSession: HttpSession): String {
+        return when {
+            !userService.checkUser(httpSession, model) -> "redirect:/login-page"
+            else -> {
+                categoryService.saveNewCategory(manage)
+                movieService.setUpMovieHome(model, "")
+            }
+        }
+    }
+
+    @PostMapping("/add-new-country")
+    fun addNewCountry(@ModelAttribute("manage") manage: Manage, model: Model, httpSession: HttpSession): String {
+        return when {
+            !userService.checkUser(httpSession, model) -> "redirect:/login-page"
+            else -> {
+                countryService.saveNewCountry(manage)
+                movieService.setUpMovieHome(model, "")
+            }
+        }
     }
 
     @PostMapping("/search")
-    fun search(@ModelAttribute("search") search: Search, model: Model): String {
-        return handelSearch(search, model)
+    fun search(@ModelAttribute("search") search: Search, model: Model, httpSession: HttpSession): String {
+        return mainService.handelSearch(search, model, httpSession)
     }
 
 
-    private fun handelSearch(search: Search, model: Model): String {
-        if (search.searchCriteria.isNullOrEmpty()) {
-            return setUpMovieHome(model, "")
+    @RequestMapping("/login-page")
+    fun login(model: Model): String {
+        model.addAttribute("login", Login("", "", ""))
+        return "login"
+    }
+
+    @RequestMapping("/logout")
+    fun logout(model: Model, httpSession: HttpSession): String {
+        httpSession.removeAttribute("user")
+        return "redirect:/login-page"
+    }
+
+    @GetMapping("/manage-user")
+    fun manageUser(model: Model, httpSession: HttpSession): String {
+
+        return when {
+            !userService.checkUser(httpSession, model) -> "redirect:/login-page"
+            else -> if (userService.checkUserLevel(httpSession, 10)){userService.setupManageUser(model)} else {"mainPage"}
         }
-        if ("movie".equals(search.searchType.orEmpty(), true)) {
-            return searchMovieOriginalTitle(search, model)
-        } else if ("actor".equals(search.searchType.orEmpty(), true)) {
-            return searchPersonName(search, model)
-        } else if ("all".equals(search.searchType.orEmpty(), true)) {
-            return setUpMovieHome(model, "")
-        } else {
-            return setUpMovieHome(model, "Search criteria " + search.searchType.orEmpty() + " not done")
+    }
+
+    @PostMapping("/save-new-user")
+    fun addNewUser(@ModelAttribute("user") user: User, model: Model, httpSession: HttpSession): String {
+        return when {
+            !userService.checkUser(httpSession, model) -> "redirect:/login-page"
+            else -> {
+                userService.saveNewUser(user, httpSession, model)
+            }
         }
     }
 
-    private fun searchPersonName(search: Search, model: Model): String {
-        val persons = personService.searchName(restTemplate, search.searchCriteria.orEmpty())
-
-        if (persons.isEmpty()){
-            return setUpMovieHome(model, "No persons found with search criteria " + search.searchCriteria.orEmpty())
+    @RequestMapping("/remove-user/{userOid}")
+    fun removeUser(@PathVariable userOid: Long, model: Model, httpSession: HttpSession): String {
+        return when {
+            !userService.checkUser(httpSession,model) -> "redirect:/login-page"
+            else -> userService.removeUser(userOid, model)
         }
-        if (persons.size == 1) {
-            return setUpOnePerson(model, persons.get(0).oid!!)
-        }
-        model.addAttribute("personList", persons)
-        return "persons"
     }
 
-    private fun setUpOnePerson(model: Model, oid: Long): String {
-        model.addAttribute("personAllInfo", personService.getAllInfoOnePerson(restTemplate, oid))
-        return "person"
-    }
-
-    private fun setUpMovieHome(model: Model ,message : String): String {
-        model.addAttribute("movieAllInfoLatest", movieService.getLatestMovie(restTemplate))
-        model.addAttribute("search", Search())
-        model.addAttribute("message", message)
-        return "movieHome"
-    }
-
-    private fun searchMovieOriginalTitle(search: Search, model: Model): String {
-        val movies = movieService.searchOriginalTitle(restTemplate, search.searchCriteria.orEmpty())
-
-        if (movies.isEmpty()){
-            return setUpMovieHome(model, "No movies found with search criteria " + search.searchCriteria.orEmpty())
-        }
-        if (movies.size == 1) {
-            return setUpMovie(model, movies.get(0).oid!!)
-        }
-        model.addAttribute("movieList", movies)
-        return "movies"
-    }
-
-    private fun setUpMovie(model: Model, oid: Long): String {
-        model.addAttribute("movieAllInfo", movieService.getAllInfoOneMovie(restTemplate, oid))
-        return "movie"
-    }
 
 }

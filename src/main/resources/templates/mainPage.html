@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>obf's Libary</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+</head>
+<body class="container">
+<h1>obf's Libary</h1>
+<div class="jumbotron">
+    <div class="row">
+        <div class="col-md-2" style="margin-top:1px">
+            <a href="/movieHome" class="btn btn-primary" role="button">Movie Home</a>
+        </div>
+    </div>
+    <br>
+    <div th:if="${user.level == 10}">
+        <div class="row">
+            <div class="col-md-2" style="margin-top:1px">
+                <a href="/manage-user" class="btn btn-primary" role="button">manage-user</a>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-2" style="margin-top:1px">
+                <a href="/logout" class="btn btn-primary" role="button">Log out</a>
+            </div>
+        </div>
+    </div>
+
+    <div th:unless="${user.level == 10}">
+        <div class="row">
+            <div class="col-md-2" style="margin-top:1px">
+                <a href="/login-page" class="btn btn-primary" role="button">Log in</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

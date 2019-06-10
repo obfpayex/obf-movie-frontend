@@ -30,6 +30,7 @@
             <p th:text="'Length: ' +  ${movieAllInfo.movie.runningTime} + ' min'"/>
             <!--p th:text="'Release date: ' +  ${dates.format(movieAllInfo.movie.releaseDate, 'yyyy-MM-dd')}"/-->
             <p th:text="'Release date: ' +  ${movieAllInfo.movie.releaseDate}"/>
+            <br>
             <p th:text="'Summary: '"/>
             <p th:text="${movieAllInfo.movie.summary}"/>
 
@@ -39,76 +40,123 @@
                 <p th:text="${movieAllInfo.categoriesAsString}"/>
             </div>
             <br>
+            <div class="row">
+                <div class="col-md-3" style="margin-top:1px">
+                    <a href="/movieHome" class="btn btn-primary" role="button">Home</a>
+                </div>
+                <div class="col-md-5" style="margin-top:1px">
+                    <div th:if="${user.level > 6}">
+                        <a th:href="@{|/edit-movie/${movieAllInfo.movie.oid}|}" class="btn btn-primary" role="button">Edit</a>
+                    </div>
+                </div>
+                <div class="col-md-4" style="margin-top:1px">
+                    <div th:if="${user.level > 6}">
+
+                        <a data-toggle="modal" data-target="#modal-warning"
+                           th:attr="data-target='#modal-warning'+${movieAllInfo.movie.oid }"
+                           class="btn btn-danger">Delete</a>
+
+                    </div>
+                </div>
+
+            </div>
+            <br>
+            <div th:if="${user.level > 5}">
+                <div class="row">
+                    <div class="col-md-4" style="margin-top:1px">
+                        <a th:href="@{|/add-actor-to-movie/${movieAllInfo.movie.oid}|}" class="btn btn-primary"
+                           role="button">Add Actor</a>
+                    </div>
+                    <div class="col-md-4" style="margin-top:1px">
+                        <a th:href="@{|/add-director-to-movie/${movieAllInfo.movie.oid}|}" class="btn btn-primary"
+                           role="button">Add Director</a>
+                    </div>
+                    <div class="col-md-4" style="margin-top:1px">
+                        <a th:href="@{|/add-category/${movieAllInfo.movie.oid}|}" class="btn btn-primary" role="button">Add
+                            Category</a>
+                    </div>
+                </div>
+
+                <br>
+                <div class="row">
+                    <div class="col-md-2" style="margin-top:1px">
+                        <a th:href="@{|/load-import-actor/${movieAllInfo.movie.oid}|}" class="btn btn-primary"
+                           role="button">Import
+                            Actor</a>
+                    </div>
+
+                </div>
+            </div>
         </div>
 
         <div class="col-md-6" style="margin-top:1px">
             <h2>Directors's</h2>
             <div th:if="${!movieAllInfo.directorsToMovie.isEmpty()}">
                 <div th:each="directorToMovie : ${movieAllInfo.directorsToMovie}">
-                    <a th:text="${directorToMovie.firstName} + ' ' + ${directorToMovie.lastName}"
-                       th:href="@{|/get-person/${directorToMovie.personOid}|}"/>
-                    <a th:href="@{'/remove-director/' + ${directorToMovie.movieDirectorOid} + '/' + ${movieAllInfo.movie.oid}} "
-                       style="color: red">&nbsp;&nbsp;&nbsp;Remove</a>
+                    <div th:if="${user.level > 6}">
+                        <a th:text="${directorToMovie.firstName} + ' ' + ${directorToMovie.lastName}"
+                           th:href="@{|/get-person/${directorToMovie.personOid}|}"/>
+                        <a th:href="@{'/remove-director/' + ${directorToMovie.movieDirectorOid} + '/' + ${movieAllInfo.movie.oid}} "
+                           style="color: red">&nbsp;&nbsp;&nbsp;Remove</a>
+                    </div>
+                    <div th:unless="${user.level > 6}">
+                        <a th:text="${directorToMovie.firstName} + ' ' + ${directorToMovie.lastName}"
+                           th:href="@{|/get-person/${directorToMovie.personOid}|}"/>
+                    </div>
                 </div>
-
-                <!--a th:href="@{|/get-person}"><i class="fa fa-square-o"></i></a>
-                <a th:href="@{|/get-person}"><i class="fa fa-trash"></i></a>
-
-
-
-                <div><a th:href="@{|/add-director-to-movie/${movieAllInfo.movie.oid}|}"><span class="glyphicon glyphicon-trash"></span>a</a></div>
-                <div><a th:href="@{|/add-director-to-movie/${movieAllInfo.movie.oid}|}"><span class="glyphicon glyphicon-trash"></span></a></div-->
-                <!--div><i class="fa fa-trash" aria-hidden="true"></i></div-->
-
             </div>
+
+            <!--a th:href="@{|/get-person}"><i class="fa fa-square-o"></i></a>
+            <a th:href="@{|/get-person}"><i class="fa fa-trash"></i></a>
+
+
+
+            <div><a th:href="@{|/add-director-to-movie/${movieAllInfo.movie.oid}|}"><span class="glyphicon glyphicon-trash"></span>a</a></div>
+            <div><a th:href="@{|/add-director-to-movie/${movieAllInfo.movie.oid}|}"><span class="glyphicon glyphicon-trash"></span></a></div-->
+            <!--div><i class="fa fa-trash" aria-hidden="true"></i></div-->
             <br>
             <h2>Actor's</h2>
             <div th:if="${!movieAllInfo.actorsToMovie.isEmpty()}">
                 <div th:each="actorToMovie : ${movieAllInfo.actorsToMovie}">
                     <div th:if="${actorToMovie.characterName != null}">
-                        <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' As ' + ${actorToMovie.characterName}"
-                           th:href="@{|/get-person/${actorToMovie.personOid}|}"/>
-                        <a th:href="@{'/remove-actor/' + ${actorToMovie.movieActorOid} + '/' + ${movieAllInfo.movie.oid}} "
-                           style="color: red">&nbsp;&nbsp;&nbsp;Remove</a>
+                        <div th:if="${user.level > 6}">
+                            <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' As ' + ${actorToMovie.characterName}"
+                               th:href="@{|/get-person/${actorToMovie.personOid}|}"/><a
+                                th:href="@{'/remove-actor/' + ${actorToMovie.movieActorOid} + '/' + ${movieAllInfo.movie.oid}} "
+                                style="color: red">&nbsp;&nbsp;&nbsp;Remove</a>
+                        </div>
+                        <div th:unless="${user.level > 6}">
+                            <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName} + ' As ' + ${actorToMovie.characterName}"
+                               th:href="@{|/get-person/${actorToMovie.personOid}|}"/>
+                        </div>
                     </div>
                     <div th:if="${actorToMovie.characterName == null}">
-                        <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName}"
-                           th:href="@{|/get-person/${actorToMovie.personOid}|}"/>
-                        <a th:href="@{'/remove-actor/' + ${actorToMovie.movieActorOid} + '/' + ${movieAllInfo.movie.oid}} "
-                           style="color: red">&nbsp;&nbsp;&nbsp;Remove</a>
+                        <div th:if="${user.level > 6}">
+                            <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName}"
+                               th:href="@{|/get-person/${actorToMovie.personOid}|}"/><a
+                                th:href="@{'/remove-actor/' + ${actorToMovie.movieActorOid} + '/' + ${movieAllInfo.movie.oid}} "
+                                style="color: red">&nbsp;&nbsp;&nbsp;Remove</a>
+                        </div>
+                        <div th:unless="${user.level > 6}">
+                            <a th:text="${actorToMovie.firstName} + ' ' + ${actorToMovie.lastName}"
+                               th:href="@{|/get-person/${actorToMovie.personOid}|}"/>
+                        </div>
                     </div>
                 </div>
             </div>
             <br>
-            <div>
-
+            <div th:if="${!showAll}">
+                <a th:href="@{|/show-all-actor-to-movie/${movieAllInfo.movie.oid}|}" class="btn btn-primary"
+                   role="button">Show all</a>
+            </div>
+            <div th:unless="${!showAll}">
+                <a th:href="@{|/hide-all-actor-to-movie/${movieAllInfo.movie.oid}|}" class="btn btn-primary"
+                   role="button">Hide</a>
             </div>
         </div>
-        <br>
-
-    </div>
-    <br>
-    <div class="row">
-        <div class="col-md-2" style="margin-top:1px">
-            <a href="/movieHome" class="btn btn-primary" role="button">Home</a>
-        </div>
-        <div class="col-md-2" style="margin-top:1px">
-            <div><a data-toggle="modal" data-target="#modal-warning"
-                    th:attr="data-target='#modal-warning'+${movieAllInfo.movie.oid }" class="btn btn-danger">Delete</a>
-            </div>
-        </div>
-        <div class="col-md-2" style="margin-top:1px">
-            <a th:href="@{|/add-actor-to-movie/${movieAllInfo.movie.oid}|}" class="btn btn-primary" role="button">Add Actor</a>
-        </div>
-        <div class="col-md-2" style="margin-top:1px">
-            <a th:href="@{|/add-director-to-movie/${movieAllInfo.movie.oid}|}" class="btn btn-primary" role="button">Add Director</a>
-        </div>
-        <div class="col-md-2" style="margin-top:1px">
-            <a th:href="@{|/add-category/${movieAllInfo.movie.oid}|}" class="btn btn-primary" role="button">Add Category</a>
-        </div>
-
     </div>
 </div>
+
 </body>
 
 <div class="modal modal-warning fade in" th:id="modal-warning+${movieAllInfo.movie.oid }">

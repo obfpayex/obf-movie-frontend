@@ -28,8 +28,7 @@
                 <label for="name">Name:</label>
                 <input type="text" class="form-control" placeholder="Enter name" id="name" th:field="*{name}"/>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-            <button type="reset" class="btn btn-primary">Cancel</button>
+            <button type="submit" class="btn btn-primary">Add</button>
         </form>
         <br>
         <div th:if="${!newDirector.persons.isEmpty()}">
@@ -50,6 +49,13 @@
                th:href="@{'add-director-to-movie-as-new/' + ${newDirector.movieOid}+ '/' + ${newDirector.name}}"/>
         </div>
 
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-md-4" style="margin-top:1px">
+        <a th:href="@{|/getMovie/${newDirector.movieOid}|}" class="btn btn-primary"
+           role="button">Cancel</a>
     </div>
 </div>
 </body>
