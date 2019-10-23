@@ -170,7 +170,7 @@ class WebControllerMovie(private val restTemplate: RestTemplate,
     fun saveNewCategory(@ModelAttribute("newCategory") newCategory: NewCategory, model: Model, httpSession: HttpSession): String {
         return when {
             !userService.checkUser(httpSession,model) -> "redirect:/login-page"
-            else -> movieService.saveNewCategory(newCategory, model)
+            else -> movieService.saveNewCategory(newCategory, model, httpSession)
         }
     }
 

@@ -216,15 +216,9 @@ class MovieService(private val personService: PersonService,
         return addAllInfoMovieToModel(model, allInfoMovie, showAll )
     }
 
-
-    fun setUpMovie(model: Model, oid: Long): String {
-        addAllInfoMovieToModel(model, getAllInfoOneMovie(oid), false)
-        return "movie"
-    }
-
     fun addAllInfoMovieToModel(model: Model, movieAllInfo: MovieAllInfo, showAll: Boolean): String{
         var copyObject = movieAllInfo.copy()
-        if (!showAll && copyObject.actorsToMovie!!.size > 15){
+        if (!showAll && copyObject.actorsToMovie.orEmpty().size > 15){
             var copyList = copyObject.actorsToMovie!!.subList(0,15)
             copyObject.actorsToMovie = copyList
         }
@@ -241,9 +235,9 @@ class MovieService(private val personService: PersonService,
         return setUpMovie(model, movieOid, httpSession, true)
     }
 
-    fun addActorToMovieAsNew(movieOid: Long, name: String, roleTypeOid: Long, charachter: String, model: Model, httpSession: HttpSession): String {
+    fun addActorToMovieAsNew(movieOid: Long, name: String, roleTypeOid: Long, character: String, model: Model, httpSession: HttpSession): String {
         val person = personService.saveNewPerson(name)
-        return addChosenActorToMovie(movieOid, person.oid!!, roleTypeOid, charachter, model, httpSession)
+        return addChosenActorToMovie(movieOid, person.oid!!, roleTypeOid, character, model, httpSession)
     }
 
     fun addChosenDirectorToMovie(movieOid: Long, personOid: Long, model: Model, httpSession: HttpSession): String {
@@ -312,9 +306,10 @@ class MovieService(private val personService: PersonService,
         return "addCategory"
     }
 
-    fun saveNewCategory(newCategory: NewCategory, model: Model): String {
+    fun saveNewCategory(newCategory: NewCategory, model: Model, httpSession: HttpSession): String {
         saveCategoryOnMovie(newCategory.categoryOid!!, newCategory.movieOid)
-        return setUpMovie(model, newCategory.movieOid)
+        httpSession.removeAttribute("movieAllInfoOriginal")
+        return setUpMovie(model, newCategory.movieOid, httpSession, false)
     }
 
     fun setUpMovieHome(model: Model, message: String): String {
