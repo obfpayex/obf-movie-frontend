@@ -26,7 +26,7 @@ class UtilService (private val restTemplate: RestTemplate){
 
     fun postObject(request: Any, url: String): ResponseEntity<String> {
         val headers = HttpHeaders()
-        headers.set("Session-Id", null)
+        headers.set("", null)
         headers.contentType = MediaType.APPLICATION_JSON;
 
 
